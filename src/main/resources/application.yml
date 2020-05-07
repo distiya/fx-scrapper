@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: fx-scapper
+  profiles:
+    active: dev
+server:
+  port: 9999
+app:
+  config:
+    broker:
+      name: oanda
+      mode: DEMO
+      apiToken: ${OANDA_API_TOKEN}
+      apiAccount: ${OANDA_API_ACCOUNT}
+      dataLocation: /home/sasitha/coding/fx/data/oanda/
+      startDate: 2005-01-01
+      supportedTickers:
+        - ticker: USD_SGD
+          enabled: false
+        - ticker: AUD_CAD
+          enabled: true
+      supportedResolutions:
+        - symbol: M5
+          minutes: 5
+          enabled: true
+        - symbol: M10
+          minutes: 10
+        - symbol: M15
+          minutes: 15
+        - symbol: M30
+          minutes: 30
+        - symbol: H1
+          hours: 1
+        - symbol: H2
+          hours: 2
+        - symbol: H3
+          hours: 3
+        - symbol: H4
+          hours: 4
+        - symbol: H6
+          hours: 6
+        - symbol: H8
+          hours: 8
+        - symbol: H12
+          hours: 12
+        - symbol: D
+          days: 1
+        - symbol: W
+          weeks: 1
+        - symbol: M
+          months: 1
+---
+spring:
+  profiles: dev
+app:
+  config:
+    broker:
+      mode: DEMO
+      apiUrl: https://api-fxpractice.oanda.com
+---
+spring:
+  profiles: prod
+app:
+  config:
+    broker:
+      mode: LIVE
+      apiUrl: https://api-fxtrade.oanda.com

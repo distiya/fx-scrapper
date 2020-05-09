@@ -2,7 +2,7 @@ spring:
   application:
     name: fx-scapper
   profiles:
-    active: dev
+    active: test
 server:
   port: 9999
 app:
@@ -10,10 +10,16 @@ app:
     broker:
       name: oanda
       mode: DEMO
+      tradingMode: true
+      scrappingMode: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2005-01-01
+      defaultResolution: M5
+      homeCurrency: SGD
+      orderPlacing: 0 0/5 * ? * *
+      timeZone: America/New_York
       supportedTickers:
         - ticker: USD_SGD
           enabled: false
@@ -65,3 +71,13 @@ app:
     broker:
       mode: LIVE
       apiUrl: https://api-fxtrade.oanda.com
+---
+spring:
+  profiles: test
+app:
+  config:
+    broker:
+      mode: DEMO
+      apiToken: fd2f8fd9a614f37400e916e79e10cd25-3fc748895294f796839860f7af270dc1
+      apiAccount: 101-003-14285287-001
+      apiUrl: https://api-fxpractice.oanda.com

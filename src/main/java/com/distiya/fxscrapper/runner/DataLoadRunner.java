@@ -3,16 +3,18 @@ package com.distiya.fxscrapper.runner;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.properties.SupportedResolutionProperties;
 import com.distiya.fxscrapper.properties.SupportedTickerProperties;
-import com.distiya.fxscrapper.service.OandaHistoryService;
+import com.distiya.fxscrapper.service.IHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppRunner implements CommandLineRunner {
+@ConditionalOnProperty(prefix = "app.config.broker",name = "scrappingMode",havingValue = "true")
+public class DataLoadRunner implements CommandLineRunner {
 
     @Autowired
-    private OandaHistoryService oandaHistoryService;
+    private IHistoryService oandaHistoryService;
 
     @Autowired
     private AppConfigProperties appConfigProperties;

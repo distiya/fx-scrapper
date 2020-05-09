@@ -3,7 +3,7 @@ package com.distiya.fxscrapper.request;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.properties.OandaResolution;
 import com.distiya.fxscrapper.properties.SupportedResolutionProperties;
-import com.distiya.fxscrapper.util.ApiDateTimeUtil;
+import com.distiya.fxscrapper.util.AppUtil;
 import com.oanda.v20.instrument.InstrumentCandlesRequest;
 import com.oanda.v20.primitives.DateTime;
 import com.oanda.v20.primitives.InstrumentName;
@@ -41,7 +41,11 @@ public class CandleHistoryRequest {
     }
 
     public void updateFromTime(LocalDateTime fromTime){
-        this.request.setFrom(new DateTime(ApiDateTimeUtil.formatToApiDateTime(fromTime)));
+        this.request.setFrom(new DateTime(AppUtil.formatToApiDateTime(fromTime)));
+    }
+
+    public void updateRecordCount(long count){
+        this.request.setCount(count);
     }
 
     private String getDataFileName(String path,String ticker,String res){

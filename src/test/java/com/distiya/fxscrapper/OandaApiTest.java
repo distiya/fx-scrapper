@@ -1,20 +1,15 @@
 package com.distiya.fxscrapper;
 
-import com.distiya.fxscrapper.domain.BoundedLimitOrder;
 import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.service.OandaHistoryService;
 import com.distiya.fxscrapper.service.OandaOrderService;
 import com.distiya.fxscrapper.service.OandaPricingService;
-import com.oanda.v20.instrument.Candlestick;
-import com.oanda.v20.instrument.CandlestickGranularity;
-import com.oanda.v20.primitives.InstrumentName;
-import com.oanda.v20.transaction.TransactionID;
+import com.distiya.fxscrapper.service.OandaStreamService;
+import com.oanda.v20.Context;
+import com.oanda.v20.account.AccountID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-import java.util.Optional;
 
 @SpringBootTest
 public class OandaApiTest {
@@ -31,12 +26,21 @@ public class OandaApiTest {
     @Autowired
     private PortfolioStatus portfolioStatus;
 
+    @Autowired
+    private AccountID accountID;
+
+    @Autowired
+    private Context context;
+
+    @Autowired
+    private OandaStreamService streamService;
+
     @Test
     public void sampleTest(){
 
     }
 
-    @Test
+    /*@Test
     public void testCurrentPrices(){
         Optional<BoundedLimitOrder> usd_sgd = orderService.placeBoundLimitOrderForCurrentAccount(new InstrumentName("USD_SGD"), 5000.0, 1.4125, 1.4135);
     }
@@ -61,4 +65,10 @@ public class OandaApiTest {
         double margin = portfolioStatus.getMargin();
         System.out.println("Margin : "+margin);
     }
+
+    @Test
+    public void testTransactionStream(){
+        streamService.getTransaction()
+                .subscribe(System.out::println);
+    }*/
 }

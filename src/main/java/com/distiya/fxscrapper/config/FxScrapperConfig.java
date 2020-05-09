@@ -3,13 +3,17 @@ package com.distiya.fxscrapper.config;
 import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.service.IAccountService;
+import com.distiya.fxscrapper.service.IStreamService;
 import com.distiya.fxscrapper.util.AppUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oanda.v20.Context;
 import com.oanda.v20.account.AccountID;
 import com.oanda.v20.primitives.Currency;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -25,6 +29,9 @@ public class FxScrapperConfig {
     @Autowired
     private IAccountService accountService;
 
+    @Autowired
+    private IStreamService streamService;
+
     @Bean
     public Context getOandaContext(){
         Context ctx = new Context(appConfigProperties.getBroker().getApiUrl(),appConfigProperties.getBroker().getApiToken());
@@ -36,8 +43,24 @@ public class FxScrapperConfig {
         return new AccountID(appConfigProperties.getBroker().getApiAccount());
     }
 
+    @Bean
+    Jackson2JsonDecoder getJacksonToJsonDecoder(ObjectMapper objectMapper){
+        return new Jackson2JsonDecoder(objectMapper);
+    }
+
+    @Bean("streamWebClient")
+    public WebClient getStreamWebClient(Jackson2JsonDecoder jackson2JsonDecoder){
+        return WebClient.builder()
+                .codecs(c->c.defaultCodecs().serverSentEventDecoder(jackson2JsonDecoder))
+                .codecs(c->c.defaultCodecs().jackson2JsonDecoder(jackson2JsonDecoder))
+                .baseUrl(appConfigProperties.getBroker().getApiStreamUrl())
+                .defaultHeader("Authorization","Bearer "+appConfigProperties.getBroker().getApiToken())
+                .build();
+    }
+
     @Bean("portfolioStatus")
     public PortfolioStatus createPortfolioStatus(AccountID currentAccount){
+        streamService.getTransactions().subscribe(System.out::println);
         PortfolioStatus portfolioStatus = new PortfolioStatus();
         accountService.getAccount(currentAccount).ifPresent(a->{
             portfolioStatus.setMargin(a.getMarginAvailable().doubleValue());

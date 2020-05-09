@@ -12,8 +12,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoundedLimitOrder{
-    InstrumentName instrument;
-    double units = 0;
+    private InstrumentName instrument;
+    private double units = 0;
+    private double longPrice = 0;
+    private double shortPrice = 0;
     private OrderType orderType;
     private TransactionID longOrderId;
     private TransactionID shortOrderId;

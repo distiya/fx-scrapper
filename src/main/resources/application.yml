@@ -10,7 +10,7 @@ app:
     broker:
       name: oanda
       mode: DEMO
-      tradingMode: true
+      tradingMode: false
       scrappingMode: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
@@ -71,6 +71,7 @@ app:
     broker:
       mode: LIVE
       apiUrl: https://api-fxtrade.oanda.com
+      apiStreamUrl: https://stream-fxtrade.oanda.com
 ---
 spring:
   profiles: test
@@ -81,3 +82,4 @@ app:
       apiToken: fd2f8fd9a614f37400e916e79e10cd25-3fc748895294f796839860f7af270dc1
       apiAccount: 101-003-14285287-001
       apiUrl: https://api-fxpractice.oanda.com
+      apiStreamUrl: https://stream-fxpractice.oanda.com

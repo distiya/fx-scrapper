@@ -20,6 +20,7 @@ public class BrokerConfigProperties {
     private String apiToken = "";
     private String apiAccount = "";
     private String apiUrl = "";
+    private String apiStreamUrl = "";
     private String dataLocation = "";
     private String timeZone = "America/New_York";
     private Long recordCount = 5000l;

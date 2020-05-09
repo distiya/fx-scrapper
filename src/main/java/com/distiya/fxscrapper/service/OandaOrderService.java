@@ -43,6 +43,7 @@ public class OandaOrderService implements IOrderService{
             boundedLimitOrder.setOrderType(OrderType.LONG_LIMIT);
             boundedLimitOrder.setLongOrderId(id);
             boundedLimitOrder.setUnits(units);
+            boundedLimitOrder.setLongPrice(price);
             log.info("Long Limit Order Created : {}",id.toString());
             return Optional.of(boundedLimitOrder);
         }
@@ -57,6 +58,7 @@ public class OandaOrderService implements IOrderService{
             boundedLimitOrder.setOrderType(OrderType.SHORT_LIMIT);
             boundedLimitOrder.setShortOrderId(id);
             boundedLimitOrder.setUnits(units);
+            boundedLimitOrder.setShortPrice(price);
             log.info("Short Limit Order Created : {}",id.toString());
             return Optional.of(boundedLimitOrder);
         }
@@ -73,6 +75,8 @@ public class OandaOrderService implements IOrderService{
             boundedLimitOrder.setLongOrderId(longId);
             boundedLimitOrder.setShortOrderId(shortId);
             boundedLimitOrder.setUnits(units);
+            boundedLimitOrder.setLongPrice(longPrice);
+            boundedLimitOrder.setShortPrice(shortPrice);
             log.info("Bounded Limit Order Created, Long Order Id : {} and Short Order Id : {}",longId.toString(),shortId.toString());
             return Optional.of(boundedLimitOrder);
         }
@@ -100,6 +104,19 @@ public class OandaOrderService implements IOrderService{
     }
 
     @Override
+    public Optional<Order> getOrder(AccountID accountID, TransactionID orderId) {
+        OrderSpecifier os = new OrderSpecifier(orderId);
+        try {
+            return Optional.of(context.order.get(accountID, os).getOrder());
+        } catch (RequestException e) {
+            log.info("RequestException while getting order | account:{},orderId:{},message:{}",accountID.toString(),orderId.toString(),e.getErrorMessage());
+        } catch (ExecuteException e) {
+            log.info("ExecuteException while getting order | account:{},orderId:{},message:{}",accountID.toString(),orderId.toString(),e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<BoundedLimitOrder> placeLongLimitOrderForCurrentAccount(InstrumentName instrument, double units, double price) {
         return placeLongLimitOrder(currentAccount,instrument,units,price);
     }
@@ -117,6 +134,11 @@ public class OandaOrderService implements IOrderService{
     @Override
     public boolean cancelOrderForCurrentUser(TransactionID orderId) {
         return cancelOrder(currentAccount,orderId);
+    }
+
+    @Override
+    public Optional<Order> getOrderForCurrentAccount(TransactionID orderId) {
+        return getOrder(currentAccount,orderId);
     }
 
     private TransactionID createOrder(AccountID accountID,InstrumentName instrument,double units,double price){

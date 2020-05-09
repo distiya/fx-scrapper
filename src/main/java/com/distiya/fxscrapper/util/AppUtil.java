@@ -1,6 +1,7 @@
 package com.distiya.fxscrapper.util;
 
 import com.distiya.fxscrapper.constant.Constants;
+import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.domain.TradeInstrument;
 import com.oanda.v20.instrument.CandlestickGranularity;
 import com.oanda.v20.primitives.Instrument;
@@ -49,5 +50,23 @@ public class AppUtil {
         String firstPair = instrumentSplit[0] + "_" + homeCurrency;
         String secondPair =  homeCurrency + "_" + instrumentSplit[0];
         return new String[]{firstPair,secondPair};
+    }
+
+    public static double getUnitCount(String instrument, PortfolioStatus portfolioStatus){
+        String[] baseHomePair = getBaseHomePair(instrument, portfolioStatus.getHomeCurrency().toString());
+        double baseHomeRate = 1.0;
+        double units = 0;
+        if(portfolioStatus.getHomeInstrumentMap().containsKey(baseHomePair[0])){
+            baseHomeRate = portfolioStatus.getHomeInstrumentMap().get(baseHomePair[0]).getCurrentMarket().getC().doubleValue();
+        }
+        else if(portfolioStatus.getHomeInstrumentMap().containsKey(baseHomePair[0])){
+            baseHomeRate = 1.0/portfolioStatus.getHomeInstrumentMap().get(baseHomePair[0]).getCurrentMarket().getC().doubleValue();
+        }
+        if(portfolioStatus.getTradeInstrumentMap().containsKey(instrument)){
+            TradeInstrument tradeInstrument = portfolioStatus.getTradeInstrumentMap().get(instrument);
+            units = portfolioStatus.getMargin() * tradeInstrument.getCurrentFraction()/baseHomeRate;
+            tradeInstrument.setMaxUnits(units);
+        }
+        return units;
     }
 }

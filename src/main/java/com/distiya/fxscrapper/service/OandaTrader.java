@@ -113,43 +113,45 @@ public class OandaTrader implements ITrader{
     }
 
     private void placeOrderForTradeInstrument(TradeInstrument ti){
-        double highDiff = ti.getCurrentPredicted().getH().doubleValue() - ti.getPreviousPredicted().getH().doubleValue();
-        double lowDiff = ti.getCurrentPredicted().getL().doubleValue() - ti.getPreviousPredicted().getL().doubleValue();
-        double highPrice = ti.getCurrentMarket().getH().doubleValue() + highDiff;
-        double lowPrice = ti.getCurrentMarket().getL().doubleValue() + lowDiff;
-        if(ti.getCurrentOrder() == null){
-            Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
-            boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));
-        }
-        else{
-            List<Order> existingOrder = portfolioStatus.getAccount().getOrders().stream().filter(o -> o.getId().equals(ti.getCurrentOrder().getLongOrderId()) || o.getId().equals(ti.getCurrentOrder().getShortOrderId()))
-                    .limit(2).collect(Collectors.toList());
-            if(existingOrder.size() == 2 && !existingOrder.get(0).getId().equals(existingOrder.get(1).getId())){
-                Order shortOrder = null;
-                Order longOrder = null;
-                if(existingOrder.get(0).getId().equals(ti.getCurrentOrder().getShortOrderId()))
-                    shortOrder = existingOrder.get(0);
-                else if(existingOrder.get(1).getId().equals(ti.getCurrentOrder().getShortOrderId()))
-                    shortOrder = existingOrder.get(1);
-                if(existingOrder.get(0).getId().equals(ti.getCurrentOrder().getLongOrderId()))
-                    longOrder = existingOrder.get(0);
-                else if(existingOrder.get(1).getId().equals(ti.getCurrentOrder().getLongOrderId()))
-                    longOrder = existingOrder.get(1);
-                if(shortOrder != null && longOrder != null){
-                    if(shortOrder.getState().equals(OrderState.FILLED) && longOrder.getState().equals(OrderState.FILLED)){
-                        Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
-                        boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));
-                    }
-                    else if(shortOrder.getState().equals(OrderState.FILLED) && longOrder.getState().equals(OrderState.PENDING)){
-                        if(lowPrice < ti.getCurrentOrder().getLongPrice()){
-                            orderService.cancelOrderForCurrentUser(ti.getCurrentOrder().getLongOrderId());
-                            orderService.placeLongLimitOrderForCurrentAccount(ti.getInstrument().getName(),ti.getCurrentOrder().getUnits(),lowPrice).ifPresent(bo->ti.getCurrentOrder().setLongOrderId(bo.getLongOrderId()));
+        if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
+            double highDiff = ti.getCurrentPredicted().getH().doubleValue() - ti.getPreviousPredicted().getH().doubleValue();
+            double lowDiff = ti.getCurrentPredicted().getL().doubleValue() - ti.getPreviousPredicted().getL().doubleValue();
+            double highPrice = ti.getCurrentMarket().getH().doubleValue() + highDiff;
+            double lowPrice = ti.getCurrentMarket().getL().doubleValue() + lowDiff;
+            if(ti.getCurrentOrder() == null){
+                Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
+                boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));
+            }
+            else{
+                List<Order> existingOrder = portfolioStatus.getAccount().getOrders().stream().filter(o -> o.getId().equals(ti.getCurrentOrder().getLongOrderId()) || o.getId().equals(ti.getCurrentOrder().getShortOrderId()))
+                        .limit(2).collect(Collectors.toList());
+                if(existingOrder.size() == 2 && !existingOrder.get(0).getId().equals(existingOrder.get(1).getId())){
+                    Order shortOrder = null;
+                    Order longOrder = null;
+                    if(existingOrder.get(0).getId().equals(ti.getCurrentOrder().getShortOrderId()))
+                        shortOrder = existingOrder.get(0);
+                    else if(existingOrder.get(1).getId().equals(ti.getCurrentOrder().getShortOrderId()))
+                        shortOrder = existingOrder.get(1);
+                    if(existingOrder.get(0).getId().equals(ti.getCurrentOrder().getLongOrderId()))
+                        longOrder = existingOrder.get(0);
+                    else if(existingOrder.get(1).getId().equals(ti.getCurrentOrder().getLongOrderId()))
+                        longOrder = existingOrder.get(1);
+                    if(shortOrder != null && longOrder != null){
+                        if(shortOrder.getState().equals(OrderState.FILLED) && longOrder.getState().equals(OrderState.FILLED)){
+                            Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
+                            boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));
                         }
-                    }
-                    else if(shortOrder.getState().equals(OrderState.PENDING) && longOrder.getState().equals(OrderState.FILLED)){
-                        if(highPrice > ti.getCurrentOrder().getShortPrice()){
-                            orderService.cancelOrderForCurrentUser(ti.getCurrentOrder().getShortOrderId());
-                            orderService.placeShortLimitOrderForCurrentAccount(ti.getInstrument().getName(),ti.getCurrentOrder().getUnits(),highPrice).ifPresent(bo->ti.getCurrentOrder().setShortOrderId(bo.getLongOrderId()));
+                        else if(shortOrder.getState().equals(OrderState.FILLED) && longOrder.getState().equals(OrderState.PENDING)){
+                            if(lowPrice < ti.getCurrentOrder().getLongPrice()){
+                                orderService.cancelOrderForCurrentUser(ti.getCurrentOrder().getLongOrderId());
+                                orderService.placeLongLimitOrderForCurrentAccount(ti.getInstrument().getName(),ti.getCurrentOrder().getUnits(),lowPrice).ifPresent(bo->ti.getCurrentOrder().setLongOrderId(bo.getLongOrderId()));
+                            }
+                        }
+                        else if(shortOrder.getState().equals(OrderState.PENDING) && longOrder.getState().equals(OrderState.FILLED)){
+                            if(highPrice > ti.getCurrentOrder().getShortPrice()){
+                                orderService.cancelOrderForCurrentUser(ti.getCurrentOrder().getShortOrderId());
+                                orderService.placeShortLimitOrderForCurrentAccount(ti.getInstrument().getName(),ti.getCurrentOrder().getUnits(),highPrice).ifPresent(bo->ti.getCurrentOrder().setShortOrderId(bo.getLongOrderId()));
+                            }
                         }
                     }
                 }

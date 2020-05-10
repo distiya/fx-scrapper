@@ -75,5 +75,8 @@ public class OandaApiTest {
     @Test
     public void testPredictService(){
         predictService.getPredictionsForPortfolio(portfolioStatus);
+        portfolioStatus.getTradeInstrumentMap().values().forEach(ti->{
+            System.out.println("Instrument Name : "+ti.getInstrument().getName().toString()+", O:"+ti.getCurrentPredicted().getO().doubleValue()+",C:"+ti.getCurrentPredicted().getC().doubleValue()+",H:"+ti.getCurrentPredicted().getH().doubleValue()+",L:"+ti.getCurrentPredicted().getL().doubleValue());
+        });
     }
 }

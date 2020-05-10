@@ -26,9 +26,9 @@ app:
       timeZone: America/New_York
       supportedTickers:
         - ticker: USD_SGD
-          enabled: false
-        - ticker: AUD_CAD
           enabled: true
+        - ticker: AUD_CAD
+          enabled: false
       supportedResolutions:
         - symbol: M5
           minutes: 5

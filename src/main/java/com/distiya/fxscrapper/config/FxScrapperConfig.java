@@ -1,6 +1,7 @@
 package com.distiya.fxscrapper.config;
 
 import com.distiya.fxscrapper.domain.PortfolioStatus;
+import com.distiya.fxscrapper.predict.FxPredictGrpc;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.service.IAccountService;
 import com.distiya.fxscrapper.service.IStreamService;
@@ -9,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oanda.v20.Context;
 import com.oanda.v20.account.AccountID;
 import com.oanda.v20.primitives.Currency;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -94,5 +97,19 @@ public class FxScrapperConfig {
             }
         });
         return portfolioStatus;
+    }
+
+    @Bean
+    public ManagedChannel getPredictServiceSyncManagedChannel(){
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(appConfigProperties.getPredictService().getHost(),appConfigProperties.getPredictService().getPort())
+                .usePlaintext()
+                .build();
+        return channel;
+    }
+
+    @Bean
+    public FxPredictGrpc.FxPredictBlockingStub getPredictServiceSyncClient(ManagedChannel channel){
+        FxPredictGrpc.FxPredictBlockingStub predictClient = FxPredictGrpc.newBlockingStub(channel);
+        return predictClient;
     }
 }

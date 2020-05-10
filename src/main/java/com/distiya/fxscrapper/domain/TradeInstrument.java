@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class TradeInstrument {
     private BoundedLimitOrder currentOrder;
     private CandlestickData previousMarket;
     private CandlestickData currentMarket;
+    private List<CandlestickData> marketHistory;
     private CandlestickData previousPredicted;
     private CandlestickData currentPredicted;
 }

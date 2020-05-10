@@ -7,6 +7,9 @@ server:
   port: 9999
 app:
   config:
+    predictService:
+      host: localhost
+      port: 50051
     broker:
       name: oanda
       mode: DEMO
@@ -17,6 +20,7 @@ app:
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2005-01-01
       defaultResolution: M5
+      defaultPredictBatchLength: 48
       homeCurrency: SGD
       orderPlacing: 0 0/5 * ? * *
       timeZone: America/New_York

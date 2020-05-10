@@ -50,6 +50,9 @@ public class OandaTrader implements ITrader{
     private IPricingService pricingService;
 
     @Autowired
+    private IPredictService predictService;
+
+    @Autowired
     @Qualifier("currentAccount")
     private AccountID currentAccount;
 
@@ -60,8 +63,8 @@ public class OandaTrader implements ITrader{
     public void trade(){
         portfolioStatus.setAccount(accountService.getCurrentAccount().orElse(portfolioStatus.getAccount()));
         portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue());
-        updateAllMarketCandles(2l);
-        //updateAllPredictedCandles
+        updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
+        predictService.getPredictionsForPortfolio(portfolioStatus);
         updateAllCurrentFraction();
         updateAllMaxUnitCount();
         placeAllOrders();
@@ -80,8 +83,9 @@ public class OandaTrader implements ITrader{
     private void updateCurrentMarketCandle(long count,List<Candlestick> cl, Map<String, TradeInstrument> timap, String key){
         if(cl.size() == count && timap.containsKey(key)){
             TradeInstrument tradeInstrument = timap.get(key);
-            tradeInstrument.setPreviousMarket(cl.get(0).getMid());
-            tradeInstrument.setCurrentMarket(cl.get(1).getMid());
+            tradeInstrument.setPreviousMarket(cl.get(cl.size()-2).getMid());
+            tradeInstrument.setCurrentMarket(cl.get(cl.size()-1).getMid());
+            tradeInstrument.setMarketHistory(cl.stream().map(c->c.getMid()).collect(Collectors.toList()));
         }
     }
 

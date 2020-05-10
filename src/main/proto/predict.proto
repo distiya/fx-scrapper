@@ -1,0 +1,49 @@
+syntax = "proto3";
+package predict;
+option java_multiple_files = true;
+option java_package = "com.distiya.fxscrapper.predict";
+option java_outer_classname = "FxPredictProtocol";
+option objc_class_prefix = "FXP";
+
+message Candle {
+    double open = 1;
+    double close = 2;
+    double high = 3;
+    double low = 4;
+}
+
+message PredictBatch {
+    string ticker = 1;
+    repeated Candle candles = 2;
+}
+
+message PredictBatchForGranularity {
+    string ticker = 1;
+    string granularity = 2;
+    repeated Candle candles = 3;
+}
+
+message MultiPredictBatchForGranularity {
+    string granularity = 1;
+    repeated PredictBatch batches = 2;
+}
+
+message PredictedCandle{
+    string ticker = 1;
+    Candle predicted = 2;
+}
+
+message PredictedCandleForGranularity{
+    string ticker = 1;
+    string granularity = 2;
+    Candle predicted = 3;
+}
+
+message MultiPredictedCandleForGranularity {
+    string granularity = 1;
+    repeated PredictedCandle candles = 2;
+}
+
+service FxPredict {
+    rpc getPredictionForBatch(MultiPredictBatchForGranularity) returns (MultiPredictedCandleForGranularity) {}
+}

@@ -26,6 +26,7 @@ public class BrokerConfigProperties {
     private Long recordCount = 5000l;
     private String candleMode = "M";
     private String defaultResolution = "M5";
+    private Long defaultPredictBatchLength = 48l;
     private String homeCurrency = "SGD";
     private String orderPlacing = "0 0/5 * ? * *";
     private Boolean tradingMode = false;

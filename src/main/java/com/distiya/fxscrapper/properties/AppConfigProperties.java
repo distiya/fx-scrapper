@@ -12,5 +12,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "app.config")
 public class AppConfigProperties {
+    private PredictServiceConfigProperties predictService = new PredictServiceConfigProperties();
     private BrokerConfigProperties broker = new BrokerConfigProperties();
 }

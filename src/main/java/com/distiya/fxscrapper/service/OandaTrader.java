@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.distiya.fxscrapper.util.AppUtil.*;
+
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
@@ -62,13 +64,16 @@ public class OandaTrader implements ITrader{
     @Scheduled(cron = "${app.config.broker.orderPlacing}")
     public void trade(){
         try{
+            log.info("{}|Starting trading",getCurrentTime());
             portfolioStatus.setAccount(accountService.getCurrentAccount().orElse(portfolioStatus.getAccount()));
             portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue());
             updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
             predictService.getPredictionsForPortfolio(portfolioStatus);
             updateAllCurrentFraction();
             updateAllMaxUnitCount();
-            placeAllOrders();
+            testPredictions();
+            //placeAllOrders();
+            log.info("{}|Ending trading",getCurrentTime());
         }
         catch (Exception e){
             log.error("Error in trading : {}",e.getMessage());
@@ -112,12 +117,23 @@ public class OandaTrader implements ITrader{
         portfolioStatus.getTradeInstrumentMap().values().forEach(ti->placeOrderForTradeInstrument(ti));
     }
 
+    private void testPredictions(){
+        portfolioStatus.getTradeInstrumentMap().values().forEach(ti->{
+            if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
+                double highPrice = calculateHighPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
+                double lowPrice = calculateLowPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
+                log.info("{}|CURRENT_MARKET|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),ti.getCurrentMarket().getH(),ti.getCurrentMarket().getL());
+                log.info("{}|NEW_PREDICT|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),highPrice,lowPrice);
+            }
+        });
+    }
+
     private void placeOrderForTradeInstrument(TradeInstrument ti){
         if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
-            double highDiff = ti.getCurrentPredicted().getH().doubleValue() - ti.getPreviousPredicted().getH().doubleValue();
-            double lowDiff = ti.getCurrentPredicted().getL().doubleValue() - ti.getPreviousPredicted().getL().doubleValue();
-            double highPrice = ti.getCurrentMarket().getH().doubleValue() + highDiff;
-            double lowPrice = ti.getCurrentMarket().getL().doubleValue() + lowDiff;
+            double highPrice = calculateHighPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
+            double lowPrice = calculateLowPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
+            log.info("{}|CURRENT_MARKET|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),ti.getCurrentMarket().getH(),ti.getCurrentMarket().getL());
+            log.info("{}|NEW_PREDICT|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),highPrice,lowPrice);
             if(ti.getCurrentOrder() == null){
                 Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
                 boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));

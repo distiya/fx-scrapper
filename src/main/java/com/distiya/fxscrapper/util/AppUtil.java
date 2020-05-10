@@ -1,21 +1,24 @@
 package com.distiya.fxscrapper.util;
 
-import com.distiya.fxscrapper.constant.Constants;
 import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.domain.TradeInstrument;
+import com.oanda.v20.instrument.CandlestickData;
 import com.oanda.v20.instrument.CandlestickGranularity;
 import com.oanda.v20.primitives.Instrument;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.distiya.fxscrapper.constant.Constants.API_DATE_FORMAT;
+import static com.distiya.fxscrapper.constant.Constants.API_DATE_FORMATTER;
+
 public class AppUtil {
     public static String formatToApiDateTime(LocalDateTime localDateTime){
-        return localDateTime.format(DateTimeFormatter.ofPattern(Constants.API_DATE_FORMAT)).replace(" ","T");
+        return localDateTime.format(DateTimeFormatter.ofPattern(API_DATE_FORMAT)).replace(" ","T");
     }
 
     public static LocalDateTime convertToLocalDateTime(String dt){
-        return LocalDateTime.parse(dt.substring(0,19).replace("T"," "),DateTimeFormatter.ofPattern(Constants.API_DATE_FORMAT));
+        return LocalDateTime.parse(dt.substring(0,19).replace("T"," "),DateTimeFormatter.ofPattern(API_DATE_FORMAT));
     }
 
     public static CandlestickGranularity getCandlestickGranularity(String res){
@@ -68,5 +71,17 @@ public class AppUtil {
             tradeInstrument.setMaxUnits(units);
         }
         return units;
+    }
+
+    public static double calculateHighPrice(CandlestickData currentMarket, CandlestickData currentPredict, CandlestickData previousPredict){
+        return currentMarket.getH().doubleValue() + currentPredict.getH().doubleValue() - previousPredict.getH().doubleValue();
+    }
+
+    public static double calculateLowPrice(CandlestickData currentMarket,CandlestickData currentPredict,CandlestickData previousPredict){
+        return currentMarket.getL().doubleValue() + currentPredict.getL().doubleValue() - previousPredict.getL().doubleValue();
+    }
+
+    public static String getCurrentTime(){
+        return LocalDateTime.now().format(API_DATE_FORMATTER);
     }
 }

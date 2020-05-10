@@ -47,9 +47,9 @@ public class OandaHistoryService implements IHistoryService{
         File dataFile = path.toFile();
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(dataFile))){
             bw.write("time,open,close,high,low,volume\n");
-            log.info("Data file writing started for "+candleHistoryRequest.getDataFileName());
+            log.info("Data file writing started for {}",candleHistoryRequest.getDataFileName());
             requestHistoryForRound(candleHistoryRequest,bw);
-            log.info("Data file writing ended for "+candleHistoryRequest.getDataFileName());
+            log.info("Data file writing ended for {}",candleHistoryRequest.getDataFileName());
         } catch (IOException e) {
             log.error("IOException while opening data file to write data {}",e.getMessage());
         }

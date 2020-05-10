@@ -70,13 +70,20 @@ public class OandaApiTest {
     public void testTransactionStream(){
         streamService.getTransaction()
                 .subscribe(System.out::println);
-    }*/
+    }
 
     @Test
     public void testPredictService(){
         predictService.getPredictionsForPortfolio(portfolioStatus);
         portfolioStatus.getTradeInstrumentMap().values().forEach(ti->{
-            System.out.println("Instrument Name : "+ti.getInstrument().getName().toString()+", O:"+ti.getCurrentPredicted().getO().doubleValue()+",C:"+ti.getCurrentPredicted().getC().doubleValue()+",H:"+ti.getCurrentPredicted().getH().doubleValue()+",L:"+ti.getCurrentPredicted().getL().doubleValue());
+            if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
+                double highDiff = ti.getCurrentPredicted().getH().doubleValue() - ti.getPreviousPredicted().getH().doubleValue();
+                double lowDiff = ti.getCurrentPredicted().getL().doubleValue() - ti.getPreviousPredicted().getL().doubleValue();
+                double highPrice = ti.getCurrentMarket().getH().doubleValue() + highDiff;
+                double lowPrice = ti.getCurrentMarket().getL().doubleValue() + lowDiff;
+                System.out.println("Instrument Name : "+ti.getInstrument().getName().toString()+", PH:"+highPrice+", PL:"+lowPrice);
+            }
+            System.out.println("Prediction for Instrument Name : "+ti.getInstrument().getName().toString()+", O:"+ti.getCurrentPredicted().getO().doubleValue()+",C:"+ti.getCurrentPredicted().getC().doubleValue()+",H:"+ti.getCurrentPredicted().getH().doubleValue()+",L:"+ti.getCurrentPredicted().getL().doubleValue());
         });
-    }
+    }*/
 }

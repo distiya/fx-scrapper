@@ -61,13 +61,18 @@ public class OandaTrader implements ITrader{
 
     @Scheduled(cron = "${app.config.broker.orderPlacing}")
     public void trade(){
-        portfolioStatus.setAccount(accountService.getCurrentAccount().orElse(portfolioStatus.getAccount()));
-        portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue());
-        updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
-        predictService.getPredictionsForPortfolio(portfolioStatus);
-        updateAllCurrentFraction();
-        updateAllMaxUnitCount();
-        placeAllOrders();
+        try{
+            portfolioStatus.setAccount(accountService.getCurrentAccount().orElse(portfolioStatus.getAccount()));
+            portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue());
+            updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
+            predictService.getPredictionsForPortfolio(portfolioStatus);
+            updateAllCurrentFraction();
+            updateAllMaxUnitCount();
+            placeAllOrders();
+        }
+        catch (Exception e){
+            log.error("Error in trading : {}",e.getMessage());
+        }
     }
 
     private void updateAllMarketCandles(long count){

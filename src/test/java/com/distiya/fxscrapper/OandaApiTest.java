@@ -1,10 +1,7 @@
 package com.distiya.fxscrapper;
 
 import com.distiya.fxscrapper.domain.PortfolioStatus;
-import com.distiya.fxscrapper.service.OandaHistoryService;
-import com.distiya.fxscrapper.service.OandaOrderService;
-import com.distiya.fxscrapper.service.OandaPricingService;
-import com.distiya.fxscrapper.service.OandaStreamService;
+import com.distiya.fxscrapper.service.*;
 import com.oanda.v20.Context;
 import com.oanda.v20.account.AccountID;
 import org.junit.jupiter.api.Test;
@@ -34,6 +31,9 @@ public class OandaApiTest {
 
     @Autowired
     private OandaStreamService streamService;
+
+    @Autowired
+    private OandaPredictService predictService;
 
     @Test
     public void sampleTest(){
@@ -71,4 +71,9 @@ public class OandaApiTest {
         streamService.getTransaction()
                 .subscribe(System.out::println);
     }*/
+
+    @Test
+    public void testPredictService(){
+        predictService.getPredictionsForPortfolio(portfolioStatus);
+    }
 }

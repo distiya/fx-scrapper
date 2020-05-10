@@ -4,6 +4,7 @@ import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.predict.FxPredictGrpc;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.service.IAccountService;
+import com.distiya.fxscrapper.service.IHistoryService;
 import com.distiya.fxscrapper.service.IStreamService;
 import com.distiya.fxscrapper.util.AppUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,9 @@ public class FxScrapperConfig {
 
     @Autowired
     private IStreamService streamService;
+
+    @Autowired
+    private IHistoryService historyService;
 
     @Bean
     public Context getOandaContext(){
@@ -82,6 +86,11 @@ public class FxScrapperConfig {
                         .map(AppUtil::mapToTradeInstrument)
                         .forEach(ti->{
                             ti.setCurrentFraction(1/tradableInstrumentFilter.size());
+                            historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getTradingGranularity(),appConfigProperties.getBroker().getDefaultPredictBatchLength())
+                                    .map(cl->cl.stream().map(c->c.getMid()).collect(Collectors.toList()))
+                                    .ifPresent(cdl->ti.setMarketHistory(cdl));
+                            ti.setPreviousMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2));
+                            ti.setCurrentMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1));
                             portfolioStatus.getTradeInstrumentMap().put(ti.getTicker(),ti);
                         });
                 Set<String> homeBasePair = tradableInstrumentFilter.stream().flatMap(tp -> Stream.of(AppUtil.getBaseHomePair(tp, appConfigProperties.getBroker().getHomeCurrency())))

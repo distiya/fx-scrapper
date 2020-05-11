@@ -66,9 +66,9 @@ public class OandaHistoryService implements IHistoryService{
         try {
             return Optional.of(context.instrument.candles(request).getCandles());
         } catch (RequestException e) {
-            log.error("RequestException while requesting candles for instrument {} with granularity {} and count {} : {}",instrument.toString(),granularity.toString(),count,e.getErrorMessage());
+            log.error("RequestException while requesting candles for instrument {} with granularity {} and count {} : {}",instrument,granularity,count,e.getErrorMessage());
         } catch (ExecuteException e) {
-            log.error("ExecuteException while requesting candles for instrument {} with granularity {} and count {} : {}",instrument.toString(),granularity.toString(),count,e.getMessage());
+            log.error("ExecuteException while requesting candles for instrument {} with granularity {} and count {} : {}",instrument,granularity,count,e.getMessage());
         }
         return Optional.empty();
     }

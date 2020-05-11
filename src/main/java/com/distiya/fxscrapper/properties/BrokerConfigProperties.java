@@ -31,6 +31,7 @@ public class BrokerConfigProperties {
     private String orderPlacing = "0 0/5 * ? * *";
     private Boolean tradingMode = false;
     private Boolean scrappingMode = false;
+    private Double leftMargin = 0.0;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate startDate = LocalDate.now();
     private List<SupportedTickerProperties> supportedTickers = new ArrayList<>();

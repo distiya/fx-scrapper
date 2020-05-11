@@ -67,7 +67,7 @@ public class FxScrapperConfig {
 
     @Bean("portfolioStatus")
     public PortfolioStatus createPortfolioStatus(AccountID currentAccount){
-        streamService.getTransactions().subscribe(System.out::println);
+        streamService.getTransactions().subscribe();
         PortfolioStatus portfolioStatus = new PortfolioStatus();
         accountService.getAccount(currentAccount).ifPresent(a->{
             portfolioStatus.setMargin(a.getMarginAvailable().doubleValue());

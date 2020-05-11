@@ -22,6 +22,7 @@ app:
       defaultResolution: M5
       defaultPredictBatchLength: 48
       homeCurrency: SGD
+      leftMargin: 99982.0
       orderPlacing: 0 0/5 * ? * *
       timeZone: America/New_York
       supportedTickers:

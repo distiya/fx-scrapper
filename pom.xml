@@ -20,6 +20,7 @@
 		<spring-cloud.version>Hoxton.SR4</spring-cloud.version>
 		<grpc.version>1.29.0</grpc.version>
 		<protoc.version>3.11.0</protoc.version>
+		<logstash-logback-encorder-version>6.3</logstash-logback-encorder-version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -40,6 +41,15 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash-logback-encorder-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-protobuf</artifactId>

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,7 @@ import static com.distiya.fxscrapper.constant.Constants.priceFormat;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
+@DependsOn("oandaContext")
 public class OandaOrderService implements IOrderService{
 
     @Autowired
@@ -78,29 +80,25 @@ public class OandaOrderService implements IOrderService{
         Double formattedLongPrice = Double.valueOf(priceFormat.format(longPrice));
         Double formattedShortPrice = Double.valueOf(priceFormat.format(shortPrice));
         Long formattedUnits = Math.round(units);
-        if(formattedShortPrice > formattedLongPrice){
-            TransactionID longId = createOrder(accountID,instrument,formattedUnits,formattedLongPrice);
-            TransactionID shortId = createOrder(accountID,instrument,-1*formattedUnits,formattedShortPrice);
-            if(longId != null && shortId != null){
-                BoundedLimitOrder boundedLimitOrder = new BoundedLimitOrder();
-                boundedLimitOrder.setOrderType(OrderType.BOUNDED_LIMIT);
-                boundedLimitOrder.setLongOrderId(longId);
-                boundedLimitOrder.setShortOrderId(shortId);
-                boundedLimitOrder.setUnits(formattedUnits);
-                boundedLimitOrder.setLongPrice(formattedLongPrice);
-                boundedLimitOrder.setShortPrice(formattedShortPrice);
-                log.info("Bounded Limit Order Created, Long Order Id : {} and Short Order Id : {}",longId,shortId);
-                return Optional.of(boundedLimitOrder);
-            }
-            else if(longId == null && shortId != null){
-                cancelOrder(accountID,shortId);
-            }
-            else if(longId != null && shortId == null){
-                cancelOrder(accountID,longId);
-            }
+        TransactionID longId = createOrder(accountID,instrument,formattedUnits,formattedLongPrice);
+        TransactionID shortId = createOrder(accountID,instrument,-1*formattedUnits,formattedShortPrice);
+        if(longId != null && shortId != null){
+            BoundedLimitOrder boundedLimitOrder = new BoundedLimitOrder();
+            boundedLimitOrder.setOrderType(OrderType.BOUNDED_LIMIT);
+            boundedLimitOrder.setLongOrderId(longId);
+            boundedLimitOrder.setShortOrderId(shortId);
+            boundedLimitOrder.setUnits(formattedUnits);
+            boundedLimitOrder.setLongPrice(formattedLongPrice);
+            boundedLimitOrder.setShortPrice(formattedShortPrice);
+            log.info("Bounded Limit Order Created, Long Order Id : {} and Short Order Id : {}",longId,shortId);
+            return Optional.of(boundedLimitOrder);
         }
-        else
-            log.info("There is no diff in price therefore skipping bounded order placement");
+        else if(longId == null && shortId != null){
+            cancelOrder(accountID,shortId);
+        }
+        else if(longId != null && shortId == null){
+            cancelOrder(accountID,longId);
+        }
         return Optional.empty();
     }
 

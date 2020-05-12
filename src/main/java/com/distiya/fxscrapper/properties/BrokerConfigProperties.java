@@ -31,7 +31,9 @@ public class BrokerConfigProperties {
     private String orderPlacing = "0 0/5 * ? * *";
     private Boolean tradingMode = false;
     private Boolean scrappingMode = false;
+    private Boolean streamingMode = false;
     private Double leftMargin = 0.0;
+    private Double minCandleDiff = 0.002;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate startDate = LocalDate.now();
     private List<SupportedTickerProperties> supportedTickers = new ArrayList<>();

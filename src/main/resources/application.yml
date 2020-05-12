@@ -13,53 +13,68 @@ app:
     broker:
       name: oanda
       mode: DEMO
-      tradingMode: true
-      scrappingMode: false
+      tradingMode: false
+      scrappingMode: true
+      streamingMode: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
-      startDate: 2005-01-01
+      startDate: 2000-01-01
       defaultResolution: M5
       defaultPredictBatchLength: 48
       homeCurrency: SGD
       leftMargin: 99982.0
+      minCandleDiff: 0.001
       orderPlacing: 0 0/5 * ? * *
       timeZone: America/New_York
       supportedTickers:
         - ticker: USD_SGD
-          enabled: true
+          enabled: false
         - ticker: AUD_CAD
           enabled: false
+        - ticker: SPX500_USD
+          enabled: true
       supportedResolutions:
         - symbol: M5
           minutes: 5
-          enabled: true
+          enabled: false
         - symbol: M10
           minutes: 10
         - symbol: M15
           minutes: 15
         - symbol: M30
           minutes: 30
+          enabled: true
         - symbol: H1
           hours: 1
+          enabled: true
         - symbol: H2
           hours: 2
+          enabled: true
         - symbol: H3
           hours: 3
+          enabled: true
         - symbol: H4
           hours: 4
+          enabled: true
         - symbol: H6
           hours: 6
+          enabled: true
         - symbol: H8
           hours: 8
+          enabled: true
         - symbol: H12
           hours: 12
+          enabled: true
         - symbol: D
           days: 1
+          enabled: true
         - symbol: W
           weeks: 1
+          enabled: true
         - symbol: M
           months: 1
+          enabled: true
 ---
 spring:
   profiles: dev

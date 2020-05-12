@@ -17,12 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.distiya.fxscrapper.util.AppUtil.*;
@@ -31,6 +30,7 @@ import static com.distiya.fxscrapper.util.AppUtil.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
+@DependsOn("oandaContext")
 @ConditionalOnProperty(prefix = "app.config.broker",name = "tradingMode",havingValue = "true")
 public class OandaTrader implements ITrader{
 
@@ -65,6 +65,17 @@ public class OandaTrader implements ITrader{
     @Autowired
     private ITradeService tradeService;
 
+    private Set<Trade> firstAgeOpenTrades = new HashSet<>();
+    private Set<Trade> secondAgeOpenTrades = new HashSet<>();
+    private Set<Trade> thirdAgeOpenTrades = new HashSet<>();
+
+    private Set<Order> firstAgeOpenOrders = new HashSet<>();
+    private Set<Order> secondAgeOpenOrders = new HashSet<>();
+    private Set<Order> thirdAgeOpenOrders = new HashSet<>();
+
+    private Optional<List<Trade>> currentOpenTrades = Optional.empty();
+    private Optional<List<Order>> currentOpenOrders = Optional.empty();
+
     @Scheduled(cron = "${app.config.broker.orderPlacing}")
     public void trade(){
         try{
@@ -75,6 +86,7 @@ public class OandaTrader implements ITrader{
             predictService.getPredictionsForPortfolio(portfolioStatus);
             updateAllCurrentFraction();
             updateAllMaxUnitCount();
+            upgradeOpenTradesAndOrdersGeneration();
             //testPredictions();
             placeAllOrders();
             log.info("{}|Ending trading",getCurrentTime());
@@ -82,6 +94,54 @@ public class OandaTrader implements ITrader{
         catch (Exception e){
             log.error("Error in trading : {}",e.getMessage());
         }
+    }
+
+    private void upgradeOpenTradesAndOrdersGeneration(){
+
+        currentOpenTrades = tradeService.getOpenTradesForCurrentAccount();
+        currentOpenOrders = orderService.getOpenOrdersForCurrentAccount();
+
+        currentOpenTrades.ifPresent(ot->{
+            ot.stream().forEach(t->{
+                if(thirdAgeOpenTrades.contains(t)){
+                    tradeService.closeTradeForCurrentAccount(t.getId());
+                    thirdAgeOpenTrades.remove(t);
+                }
+                else if(secondAgeOpenTrades.contains(t)){
+                    thirdAgeOpenTrades.add(t);
+                    secondAgeOpenTrades.remove(t);
+                    log.info("Trade {} got promoted to third generation",t.getId());
+                }
+                else if(firstAgeOpenTrades.contains(t)){
+                    secondAgeOpenTrades.add(t);
+                    firstAgeOpenTrades.remove(t);
+                    log.info("Trade {} got promoted to second generation",t.getId());
+                }
+                else
+                    firstAgeOpenTrades.add(t);
+            });
+        });
+
+        currentOpenOrders.ifPresent(ot->{
+            ot.stream().forEach(t->{
+                if(thirdAgeOpenOrders.contains(t)){
+                    orderService.cancelOrderForCurrentUser(new TransactionID(t.getId().toString()));
+                    thirdAgeOpenOrders.remove(t);
+                }
+                else if(secondAgeOpenOrders.contains(t)){
+                    thirdAgeOpenOrders.add(t);
+                    secondAgeOpenOrders.remove(t);
+                    log.info("Order {} got promoted to third generation",t.getId());
+                }
+                else if(firstAgeOpenOrders.contains(t)){
+                    secondAgeOpenOrders.add(t);
+                    firstAgeOpenOrders.remove(t);
+                    log.info("Order {} got promoted to second generation",t.getId());
+                }
+                else
+                    firstAgeOpenOrders.add(t);
+            });
+        });
     }
 
     private void updateAllMarketCandles(long count){
@@ -104,9 +164,11 @@ public class OandaTrader implements ITrader{
     }
 
     private void updateAllCurrentFraction(){
-        double totalFraction = portfolioStatus.getTradeInstrumentMap().values().stream().mapToDouble(t -> t.getCurrentPredicted().getH().doubleValue()-t.getCurrentPredicted().getL().doubleValue()).sum();
+        double totalFraction = portfolioStatus.getTradeInstrumentMap().values().stream().mapToDouble(t -> formatPrice(t.getCurrentPredicted().getH().doubleValue())-formatPrice(t.getCurrentPredicted().getL().doubleValue())).filter(diff->diff >=appConfigProperties.getBroker().getMinCandleDiff()).sum();
         portfolioStatus.getTradeInstrumentMap().values().stream().forEach(ti->{
-            double fraction = (ti.getCurrentPredicted().getH().doubleValue()-ti.getCurrentPredicted().getL().doubleValue())/totalFraction;
+            double diff = (formatPrice(ti.getCurrentPredicted().getH().doubleValue())-formatPrice(ti.getCurrentPredicted().getL().doubleValue()));
+            diff = diff >= appConfigProperties.getBroker().getMinCandleDiff() ? diff : 0.0d;
+            double fraction = diff/totalFraction;
             ti.setCurrentFraction(fraction);
         });
     }
@@ -118,17 +180,24 @@ public class OandaTrader implements ITrader{
     }
 
     private void placeAllOrders(){
-        Optional<List<Trade>> openTrades = tradeService.getOpenTradesForCurrentAccount();
-        Optional<List<Order>> openOrders = orderService.getOpenOrdersForCurrentAccount();
-        openOrders.ifPresent(ol->{
-            ol.forEach(o->orderService.cancelOrderForCurrentUser(new TransactionID(o.getId().toString())));
-        });
-        openTrades.ifPresent(ot->ot.stream().forEach(t->{
-            tradeService.closeTradeForCurrentAccount(t.getId());
-        }));
-        portfolioStatus.getTradeInstrumentMap().values().forEach(ti->placeOrderForTradeInstrument(ti));
+        portfolioStatus.getTradeInstrumentMap().values().stream().filter(ti->ti.getMaxUnits() > 0).forEach(ti->placeOrderForTradeInstrument(ti));
     }
 
+    private void placeOrderForTradeInstrument(TradeInstrument ti){
+        if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
+            double highPrice = calculateHighPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
+            double lowPrice = calculateLowPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
+            log.info("{}|CURRENT_MARKET|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),ti.getCurrentMarket().getH(),ti.getCurrentMarket().getL());
+            log.info("{}|NEW_PREDICT|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),highPrice,lowPrice);
+            Optional<Trade> existingTrade = currentOpenTrades.flatMap(otl -> otl.stream().filter(t -> t.getInstrument().equals(ti.getInstrument().getName())).findFirst());
+            if(existingTrade.isEmpty()){
+                Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
+                boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));
+            }
+            else
+                log.info("There is an existing trade therefore skipping placing a trade");
+        }
+    }
     private void testPredictions(){
         portfolioStatus.getTradeInstrumentMap().values().forEach(ti->{
             if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
@@ -138,16 +207,5 @@ public class OandaTrader implements ITrader{
                 log.info("{}|NEW_PREDICT|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),highPrice,lowPrice);
             }
         });
-    }
-
-    private void placeOrderForTradeInstrument(TradeInstrument ti){
-        if(ti.getCurrentPredicted() != null && ti.getPreviousPredicted() != null){
-            double highPrice = calculateHighPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
-            double lowPrice = calculateLowPrice(ti.getCurrentMarket(),ti.getCurrentPredicted(),ti.getPreviousPredicted());
-            log.info("{}|CURRENT_MARKET|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),ti.getCurrentMarket().getH(),ti.getCurrentMarket().getL());
-            log.info("{}|NEW_PREDICT|{}|H:{}|L:{}",getCurrentTime(),ti.getInstrument().getName(),highPrice,lowPrice);
-            Optional<BoundedLimitOrder> boundedLimitOrder = orderService.placeBoundLimitOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits(), lowPrice, highPrice);
-            boundedLimitOrder.ifPresent(blo->ti.setCurrentOrder(blo));
-        }
     }
 }

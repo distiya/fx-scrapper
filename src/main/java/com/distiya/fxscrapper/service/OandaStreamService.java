@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +20,8 @@ import reactor.core.publisher.Flux;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
+@DependsOn("oandaContext")
+@ConditionalOnProperty(prefix = "app.config.broker",name = "streamingMode",havingValue = "true")
 public class OandaStreamService implements IStreamService{
 
     @Autowired

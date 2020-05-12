@@ -9,8 +9,7 @@ import com.oanda.v20.primitives.Instrument;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.distiya.fxscrapper.constant.Constants.API_DATE_FORMAT;
-import static com.distiya.fxscrapper.constant.Constants.API_DATE_FORMATTER;
+import static com.distiya.fxscrapper.constant.Constants.*;
 
 public class AppUtil {
     public static String formatToApiDateTime(LocalDateTime localDateTime){
@@ -83,5 +82,9 @@ public class AppUtil {
 
     public static String getCurrentTime(){
         return LocalDateTime.now().format(API_DATE_FORMATTER);
+    }
+
+    public static Double formatPrice(Double inputPrice){
+        return Double.valueOf(priceFormat.format(inputPrice));
     }
 }

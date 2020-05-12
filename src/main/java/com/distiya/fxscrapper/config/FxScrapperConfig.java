@@ -16,6 +16,7 @@ import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -30,16 +31,10 @@ public class FxScrapperConfig {
     @Autowired
     private AppConfigProperties appConfigProperties;
 
-    @Autowired
-    private IAccountService accountService;
-
-    @Autowired
+    @Autowired(required = false)
     private IStreamService streamService;
 
-    @Autowired
-    private IHistoryService historyService;
-
-    @Bean
+    @Bean("oandaContext")
     public Context getOandaContext(){
         Context ctx = new Context(appConfigProperties.getBroker().getApiUrl(),appConfigProperties.getBroker().getApiToken());
         return ctx;
@@ -66,8 +61,10 @@ public class FxScrapperConfig {
     }
 
     @Bean("portfolioStatus")
-    public PortfolioStatus createPortfolioStatus(AccountID currentAccount){
-        streamService.getTransactions().subscribe();
+    @DependsOn("oandaContext")
+    public PortfolioStatus createPortfolioStatus(AccountID currentAccount,IAccountService accountService,IHistoryService historyService){
+        if(streamService != null)
+            streamService.getTransactions().subscribe();
         PortfolioStatus portfolioStatus = new PortfolioStatus();
         accountService.getAccount(currentAccount).ifPresent(a->{
             portfolioStatus.setMargin(a.getMarginAvailable().doubleValue());

@@ -14,7 +14,7 @@ app:
       name: oanda
       mode: DEMO
       tradingMode: false
-      scrappingMode: true
+      scrappingMode: false
       streamingMode: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
@@ -26,55 +26,303 @@ app:
       leftMargin: 99982.0
       minCandleDiff: 0.001
       orderPlacing: 0 0/5 * ? * *
-      timeZone: America/New_York
+      timeZone: Asia/Singapore
       supportedTickers:
+        - ticker: GBP_USD
+          enabled: false
+        - ticker: USD_MXN
+          enabled: false
+        - ticker: XAG_USD
+          enabled: false
+        - ticker: EUR_ZAR
+          enabled: false
+        - ticker: XAG_GBP
+          enabled: false
+        - ticker: EUR_CAD
+          enabled: false
+        - ticker: XAU_XAG
+          enabled: false
+        - ticker: BCO_USD
+          enabled: false
+        - ticker: EUR_NZD
+          enabled: false
+        - ticker: XPT_USD
+          enabled: false
+        - ticker: EUR_USD
+          enabled: false
+        - ticker: TRY_JPY
+          enabled: false
+        - ticker: GBP_JPY
+          enabled: false
+        - ticker: USD_TRY
+          enabled: false
+        - ticker: XAG_JPY
+          enabled: false
+        - ticker: NZD_CAD
+          enabled: false
+        - ticker: XAU_JPY
+          enabled: false
+        - ticker: CHF_ZAR
+          enabled: false
+        - ticker: XAU_HKD
+          enabled: false
+        - ticker: HKD_JPY
+          enabled: false
+        - ticker: SGD_HKD
+          enabled: false
+        - ticker: NZD_USD
+          enabled: false
+        - ticker: SGD_JPY
+          enabled: false
+        - ticker: XAU_USD
+          enabled: false
+        - ticker: NZD_SGD
+          enabled: false
+        - ticker: USD_INR
+          enabled: false
+        - ticker: CAD_HKD
+          enabled: false
+        - ticker: XPD_USD
+          enabled: false
+        - ticker: USD_DKK
+          enabled: false
+        - ticker: EUR_JPY
+          enabled: false
+        - ticker: USD_NOK
+          enabled: false
+        - ticker: XAU_SGD
+          enabled: false
+        - ticker: XAU_NZD
+          enabled: false
+        - ticker: XAG_CHF
+          enabled: false
+        - ticker: XCU_USD
+          enabled: false
+        - ticker: EUR_NOK
+          enabled: false
+        - ticker: EUR_SEK
+          enabled: false
         - ticker: USD_SGD
+          enabled: true
+        - ticker: AUD_CHF
+          enabled: false
+        - ticker: CAD_SGD
+          enabled: false
+        - ticker: USD_HUF
+          enabled: false
+        - ticker: EUR_CHF
+          enabled: false
+        - ticker: AUD_NZD
+          enabled: false
+        - ticker: EUR_DKK
+          enabled: false
+        - ticker: GBP_NZD
+          enabled: false
+        - ticker: GBP_PLN
+          enabled: false
+        - ticker: NZD_CHF
+          enabled: false
+        - ticker: CAD_CHF
+          enabled: false
+        - ticker: CHF_JPY
+          enabled: false
+        - ticker: XAU_AUD
+          enabled: false
+        - ticker: EUR_SGD
+          enabled: false
+        - ticker: XAU_CHF
+          enabled: false
+        - ticker: AUD_USD
+          enabled: false
+        - ticker: NZD_JPY
+          enabled: false
+        - ticker: EUR_GBP
+          enabled: false
+        - ticker: USD_SEK
+          enabled: false
+        - ticker: GBP_SGD
+          enabled: false
+        - ticker: XAG_HKD
+          enabled: false
+        - ticker: XAG_EUR
+          enabled: false
+        - ticker: CAD_JPY
+          enabled: false
+        - ticker: EUR_AUD
+          enabled: false
+        - ticker: XAU_GBP
+          enabled: false
+        - ticker: GBP_AUD
+          enabled: false
+        - ticker: USD_PLN
+          enabled: false
+        - ticker: GBP_HKD
+          enabled: false
+        - ticker: USD_CNH
+          enabled: false
+        - ticker: EUR_HKD
+          enabled: false
+        - ticker: EUR_HUF
+          enabled: false
+        - ticker: USD_SAR
+          enabled: false
+        - ticker: GBP_CAD
+          enabled: false
+        - ticker: AUD_HKD
+          enabled: false
+        - ticker: EUR_CZK
+          enabled: false
+        - ticker: NZD_HKD
+          enabled: false
+        - ticker: XAG_AUD
+          enabled: false
+        - ticker: XAU_EUR
+          enabled: false
+        - ticker: EUR_PLN
+          enabled: false
+        - ticker: USD_CHF
+          enabled: false
+        - ticker: GBP_CHF
+          enabled: false
+        - ticker: USD_THB
+          enabled: false
+        - ticker: GBP_ZAR
+          enabled: false
+        - ticker: XAU_CAD
+          enabled: false
+        - ticker: CHF_HKD
+          enabled: false
+        - ticker: BTC_USD
+          enabled: false
+        - ticker: XAG_CAD
+          enabled: false
+        - ticker: USD_HKD
+          enabled: false
+        - ticker: USD_ZAR
+          enabled: false
+        - ticker: SGD_CHF
+          enabled: false
+        - ticker: ZAR_JPY
+          enabled: false
+        - ticker: AUD_SGD
+          enabled: false
+        - ticker: XAG_SGD
+          enabled: false
+        - ticker: EUR_TRY
+          enabled: false
+        - ticker: USD_JPY
+          enabled: false
+        - ticker: XAG_NZD
           enabled: false
         - ticker: AUD_CAD
           enabled: false
+        - ticker: USD_CZK
+          enabled: false
+        - ticker: USD_CAD
+          enabled: false
+        - ticker: AUD_JPY
+          enabled: false
+        - ticker: NL25_EUR
+          enabled: false
+        - ticker: SG30_SGD
+          enabled: false
+        - ticker: DE30_EUR
+          enabled: false
+        - ticker: IN50_USD
+          enabled: false
+        - ticker: TWIX_USD
+          enabled: false
+        - ticker: MBTC_USD
+          enabled: false
+        - ticker: CORN_USD
+          enabled: false
+        - ticker: EU50_EUR
+          enabled: false
+        - ticker: CN50_USD
+          enabled: false
+        - ticker: FR40_EUR
+          enabled: false
+        - ticker: HK33_HKD
+          enabled: false
+        - ticker: US30_USD
+          enabled: false
+        - ticker: SOYBN_USD
+          enabled: false
+        - ticker: WTICO_USD
+          enabled: false
+        - ticker: AU200_AUD
+          enabled: false
+        - ticker: UK100_GBP
+          enabled: false
+        - ticker: SUGAR_USD
+          enabled: false
+        - ticker: JP225_USD
+          enabled: false
+        - ticker: WHEAT_USD
+          enabled: false
         - ticker: SPX500_USD
-          enabled: true
+          enabled: false
+        - ticker: UK10YB_GBP
+          enabled: false
+        - ticker: US2000_USD
+          enabled: false
+        - ticker: USB05Y_USD
+          enabled: false
+        - ticker: DE10YB_EUR
+          enabled: false
+        - ticker: USB10Y_USD
+          enabled: false
+        - ticker: USB30Y_USD
+          enabled: false
+        - ticker: NATGAS_USD
+          enabled: false
+        - ticker: USB02Y_USD
+          enabled: false
+        - ticker: NAS100_USD
+          enabled: false
       supportedResolutions:
         - symbol: M5
           minutes: 5
-          enabled: false
+          enabled: true
         - symbol: M10
           minutes: 10
+          enabled: false
         - symbol: M15
           minutes: 15
+          enabled: false
         - symbol: M30
           minutes: 30
-          enabled: true
+          enabled: false
         - symbol: H1
           hours: 1
-          enabled: true
+          enabled: false
         - symbol: H2
           hours: 2
-          enabled: true
+          enabled: false
         - symbol: H3
           hours: 3
-          enabled: true
+          enabled: false
         - symbol: H4
           hours: 4
-          enabled: true
+          enabled: false
         - symbol: H6
           hours: 6
-          enabled: true
+          enabled: false
         - symbol: H8
           hours: 8
-          enabled: true
+          enabled: false
         - symbol: H12
           hours: 12
-          enabled: true
+          enabled: false
         - symbol: D
           days: 1
-          enabled: true
+          enabled: false
         - symbol: W
           weeks: 1
-          enabled: true
+          enabled: false
         - symbol: M
           months: 1
-          enabled: true
+          enabled: false
 ---
 spring:
   profiles: dev

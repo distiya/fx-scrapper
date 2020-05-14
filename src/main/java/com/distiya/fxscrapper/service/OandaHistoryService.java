@@ -63,7 +63,7 @@ public class OandaHistoryService implements IHistoryService{
         request.setCount(count);
         request.setGranularity(granularity);
         request.setPrice(appConfigProperties.getBroker().getCandleMode());
-        request.setDailyAlignment(0l);
+        request.setDailyAlignment(6l);
         request.setAlignmentTimezone(appConfigProperties.getBroker().getTimeZone());
         try {
             return Optional.of(context.instrument.candles(request).getCandles());

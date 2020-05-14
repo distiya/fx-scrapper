@@ -33,7 +33,7 @@ public class CandleHistoryRequest {
         this.request.setCount(appConfigProperties.getBroker().getRecordCount());
         this.request.setGranularity(ors.getGranularity());
         this.request.setPrice(appConfigProperties.getBroker().getCandleMode());
-        this.request.setDailyAlignment(0l);
+        this.request.setDailyAlignment(6l);
         this.request.setIncludeFirst(true);
         this.request.setAlignmentTimezone(appConfigProperties.getBroker().getTimeZone());
         this.dataFileName = getDataFileName(appConfigProperties.getBroker().getDataLocation(),ticker,resolution.getSymbol());

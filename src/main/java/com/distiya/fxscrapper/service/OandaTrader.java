@@ -78,21 +78,23 @@ public class OandaTrader implements ITrader{
 
     @Scheduled(cron = "${app.config.broker.orderPlacing}")
     public void trade(){
-        try{
-            log.info("{}|Starting trading",getCurrentTime());
-            portfolioStatus.setAccount(accountService.getCurrentAccount().orElse(portfolioStatus.getAccount()));
-            portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue()-appConfigProperties.getBroker().getLeftMargin());
-            updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
-            predictService.getPredictionsForPortfolio(portfolioStatus);
-            updateAllCurrentFraction();
-            updateAllMaxUnitCount();
-            upgradeOpenTradesAndOrdersGeneration();
-            //testPredictions();
-            placeAllOrders();
-            log.info("{}|Ending trading",getCurrentTime());
-        }
-        catch (Exception e){
-            log.error("Error in trading : {}",e.getMessage());
+        if(!this.portfolioStatus.getIsWarmingUp()){
+            try{
+                log.info("{}|Starting trading",getCurrentTime());
+                portfolioStatus.setAccount(accountService.getCurrentAccount().orElse(portfolioStatus.getAccount()));
+                portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue()-appConfigProperties.getBroker().getLeftMargin());
+                updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
+                predictService.getPredictionsForPortfolio(portfolioStatus);
+                updateAllCurrentFraction();
+                updateAllMaxUnitCount();
+                upgradeOpenTradesAndOrdersGeneration();
+                //testPredictions();
+                placeAllOrders();
+                log.info("{}|Ending trading",getCurrentTime());
+            }
+            catch (Exception e){
+                log.error("Error in trading : {}",e.getMessage());
+            }
         }
     }
 
@@ -160,6 +162,7 @@ public class OandaTrader implements ITrader{
             tradeInstrument.setPreviousMarket(cl.get(cl.size()-2).getMid());
             tradeInstrument.setCurrentMarket(cl.get(cl.size()-1).getMid());
             tradeInstrument.setMarketHistory(cl.stream().map(c->c.getMid()).collect(Collectors.toList()));
+            tradeInstrument.setVolume(cl.stream().mapToLong(c->c.getVolume()).summaryStatistics().getAverage());
         }
     }
 

@@ -13,9 +13,9 @@ app:
     broker:
       name: oanda
       mode: DEMO
-      tradingMode: false
+      tradingMode: true
       scrappingMode: false
-      streamingMode: false
+      streamingMode: true
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/

@@ -83,7 +83,7 @@ public class FxScrapperConfig {
                         .map(AppUtil::mapToTradeInstrument)
                         .forEach(ti->{
                             ti.setCurrentFraction(1/tradableInstrumentFilter.size());
-                            historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getTradingGranularity(),appConfigProperties.getBroker().getDefaultPredictBatchLength())
+                            historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getTradingGranularity(),5000l)
                                     .map(cl->cl.stream().map(c->c.getMid()).collect(Collectors.toList()))
                                     .ifPresent(cdl->ti.setMarketHistory(cdl));
                             ti.setPreviousMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2));

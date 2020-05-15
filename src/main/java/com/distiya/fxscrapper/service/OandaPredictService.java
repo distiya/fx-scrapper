@@ -69,6 +69,8 @@ public class OandaPredictService implements IPredictService{
             TradeInstrument tradeInstrument = tradeInstrumentMap.get(pc.getTicker());
             tradeInstrument.setPreviousPredicted(tradeInstrument.getCurrentPredicted());
             tradeInstrument.setCurrentPredicted(newPredict);
+            tradeInstrument.getEmaIndicator().update(pc);
+            tradeInstrument.getStochasticIndicator().update(pc);
         });
     }
 }

@@ -22,7 +22,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.distiya.fxscrapper.util.AppUtil.*;
 
@@ -161,7 +160,7 @@ public class OandaTrader implements ITrader{
             TradeInstrument tradeInstrument = timap.get(key);
             tradeInstrument.setPreviousMarket(cl.get(cl.size()-2).getMid());
             tradeInstrument.setCurrentMarket(cl.get(cl.size()-1).getMid());
-            tradeInstrument.setMarketHistory(cl.stream().map(c->c.getMid()).collect(Collectors.toList()));
+            tradeInstrument.setMarketHistory(cl);
             tradeInstrument.setVolume(cl.stream().mapToLong(c->c.getVolume()).summaryStatistics().getAverage());
         }
     }

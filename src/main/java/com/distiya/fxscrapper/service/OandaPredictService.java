@@ -3,6 +3,7 @@ package com.distiya.fxscrapper.service;
 import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.domain.TradeInstrument;
 import com.distiya.fxscrapper.predict.*;
+import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.CandlestickData;
 import com.oanda.v20.instrument.CandlestickGranularity;
 import lombok.AllArgsConstructor;
@@ -48,8 +49,8 @@ public class OandaPredictService implements IPredictService{
         predictBatchBuilder.addAllCandles(getCandleListForCurrentMarketHistory(ti.getMarketHistory()));
         return predictBatchBuilder.build();
     }
-    private List<Candle> getCandleListForCurrentMarketHistory(List<CandlestickData> history){
-        return history.stream().map(mh->
+    private List<Candle> getCandleListForCurrentMarketHistory(List<Candlestick> history){
+        return history.stream().map(cs->cs.getMid()).map(mh->
             Candle.newBuilder()
                     .setOpen(mh.getO().doubleValue())
                     .setClose(mh.getC().doubleValue())

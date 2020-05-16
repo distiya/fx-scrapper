@@ -2,6 +2,7 @@ package com.distiya.fxscrapper.domain;
 
 import com.distiya.fxscrapper.indicator.IndicatorEMA;
 import com.distiya.fxscrapper.indicator.IndicatorStochastic;
+import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.CandlestickData;
 import com.oanda.v20.primitives.Instrument;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class TradeInstrument {
     private BoundedLimitOrder currentOrder;
     private CandlestickData previousMarket;
     private CandlestickData currentMarket;
-    private List<CandlestickData> marketHistory;
+    private List<Candlestick> marketHistory;
     private CandlestickData previousPredicted;
     private CandlestickData currentPredicted;
     private double volume;

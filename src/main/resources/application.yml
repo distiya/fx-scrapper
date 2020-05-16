@@ -20,7 +20,7 @@ app:
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
-      defaultResolution: M5
+      defaultResolution: H1
       defaultPredictBatchLength: 48
       homeCurrency: SGD
       leftMargin: 99982.0
@@ -103,7 +103,7 @@ app:
         - ticker: EUR_SEK
           enabled: false
         - ticker: USD_SGD
-          enabled: true
+          enabled: false
         - ticker: AUD_CHF
           enabled: false
         - ticker: CAD_SGD
@@ -133,7 +133,7 @@ app:
         - ticker: XAU_CHF
           enabled: false
         - ticker: AUD_USD
-          enabled: false
+          enabled: true
         - ticker: NZD_JPY
           enabled: false
         - ticker: EUR_GBP
@@ -283,7 +283,7 @@ app:
       supportedResolutions:
         - symbol: M5
           minutes: 5
-          enabled: true
+          enabled: false
         - symbol: M10
           minutes: 10
           enabled: false
@@ -295,7 +295,7 @@ app:
           enabled: false
         - symbol: H1
           hours: 1
-          enabled: false
+          enabled: true
         - symbol: H2
           hours: 2
           enabled: false

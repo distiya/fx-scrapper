@@ -84,10 +84,10 @@ public class FxScrapperConfig {
                         .forEach(ti->{
                             ti.setCurrentFraction(1/tradableInstrumentFilter.size());
                             historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getTradingGranularity(),5000l)
-                                    .map(cl->cl.stream().map(c->c.getMid()).collect(Collectors.toList()))
+                                    .map(cl->cl.stream().collect(Collectors.toList()))
                                     .ifPresent(cdl->ti.setMarketHistory(cdl));
-                            ti.setPreviousMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2));
-                            ti.setCurrentMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1));
+                            ti.setPreviousMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
+                            ti.setCurrentMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
                             portfolioStatus.getTradeInstrumentMap().put(ti.getTicker(),ti);
                         });
                 Set<String> homeBasePair = tradableInstrumentFilter.stream().flatMap(tp -> Stream.of(AppUtil.getBaseHomePair(tp, appConfigProperties.getBroker().getHomeCurrency())))

@@ -4,7 +4,7 @@
     ​
     <springProperty scope="context" name="springAppName" source="spring.application.name"/>
     <!-- Example for logging into the build folder of your project -->
-    <property name="LOG_FILE" value="/home/sasitha/coding/app-data"/>​
+    <property name="LOG_FILE" value="/home/distiya/coding/app-data"/>​
 
 <!--    <property name="LOG_FILE" value="/home/sasitha/coding/${springAppName}"/>​-->
 

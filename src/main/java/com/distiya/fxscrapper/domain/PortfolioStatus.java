@@ -4,7 +4,7 @@ import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.service.IPredictService;
 import com.oanda.v20.account.Account;
 import com.oanda.v20.account.AccountID;
-import com.oanda.v20.instrument.CandlestickData;
+import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.CandlestickGranularity;
 import com.oanda.v20.primitives.Currency;
 import com.oanda.v20.primitives.Instrument;
@@ -47,7 +47,7 @@ public class PortfolioStatus {
 
     @PostConstruct
     public void initializePortfolioWarmingUp(){
-        Map<InstrumentName,List<CandlestickData>> historyMap = new HashMap<>();
+        Map<InstrumentName,List<Candlestick>> historyMap = new HashMap<>();
         tradeInstrumentMap.values().forEach(ti->{
             historyMap.put(ti.getInstrument().getName(),ti.getMarketHistory());
         });
@@ -74,7 +74,7 @@ public class PortfolioStatus {
     @NoArgsConstructor
     public class CandlestickDataMiniBatch{
         private InstrumentName instrumentName;
-        private List<CandlestickData> miniBatch;
+        private List<Candlestick> miniBatch;
     }
 
     private PortfolioStatus combineAllMinBatches(Object[] batches){
@@ -88,8 +88,10 @@ public class PortfolioStatus {
     private void printPredictData(){
         this.tradeInstrumentMap.values().forEach(ti->{
             if(ti.getCurrentMarket() != null){
+                Candlestick currentMarket = ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
                 //SIGNAL-INDICATE|Ticker|Close|Slow_EMA|Fast_EMA|KP|DP|DNP|eMA_Signal
-                log.info("SIGNAL-INDICATE|{}|{}|{}|{}|{}|{}|{}|{}",ti.getInstrument().getName(),ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getC(),ti.getEmaIndicator().getSlowEMA(),ti.getEmaIndicator().getFastEMA(),ti.getStochasticIndicator().getKP(),ti.getStochasticIndicator().getDP(),ti.getStochasticIndicator().getDnP(),ti.getEmaIndicator().getCurrentSignal());
+                //log.info("SIGNAL-INDICATE|{}|{}|{}|{}|{}|{}|{}|{}",ti.getInstrument().getName(),ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getC(),ti.getEmaIndicator().getSlowEMA(),ti.getEmaIndicator().getFastEMA(),ti.getStochasticIndicator().getKP(),ti.getStochasticIndicator().getDP(),ti.getStochasticIndicator().getDnP(),ti.getEmaIndicator().getCurrentSignal());
+                log.info("SIGNAL-INDICATE|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}",ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentPredicted().getO(),ti.getCurrentPredicted().getC(),ti.getCurrentPredicted().getH(),ti.getCurrentPredicted().getL(),ti.getEmaIndicator().getSlowEMA(),ti.getEmaIndicator().getFastEMA(),ti.getEmaIndicator().getCurrentSignal(),ti.getStochasticIndicator().getKP(),ti.getStochasticIndicator().getDP(),ti.getStochasticIndicator().getDnP());
             }
         });
     }

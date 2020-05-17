@@ -25,7 +25,8 @@ public class BrokerConfigProperties {
     private String timeZone = "America/New_York";
     private Long recordCount = 5000l;
     private String candleMode = "M";
-    private String defaultResolution = "M5";
+    private String lowTimeFrame = "M5";
+    private String highTimeFrame = "M10";
     private Long defaultPredictBatchLength = 48l;
     private String homeCurrency = "SGD";
     private String orderPlacing = "0 0/5 * ? * *";

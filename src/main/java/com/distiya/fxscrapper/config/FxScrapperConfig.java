@@ -68,7 +68,8 @@ public class FxScrapperConfig {
         PortfolioStatus portfolioStatus = new PortfolioStatus();
         accountService.getAccount(currentAccount).ifPresent(a->{
             portfolioStatus.setMargin(a.getMarginAvailable().doubleValue());
-            portfolioStatus.setTradingGranularity(AppUtil.getCandlestickGranularity(appConfigProperties.getBroker().getDefaultResolution()));
+            portfolioStatus.setLowTradingGranularity(AppUtil.getCandlestickGranularity(appConfigProperties.getBroker().getLowTimeFrame()));
+            portfolioStatus.setHighTradingGranularity(AppUtil.getCandlestickGranularity(appConfigProperties.getBroker().getHighTimeFrame()));
             portfolioStatus.setCurrentAccount(currentAccount);
             portfolioStatus.setAccount(a);
             portfolioStatus.setHomeCurrency(new Currency(appConfigProperties.getBroker().getHomeCurrency()));
@@ -83,11 +84,16 @@ public class FxScrapperConfig {
                         .map(AppUtil::mapToTradeInstrument)
                         .forEach(ti->{
                             ti.setCurrentFraction(1/tradableInstrumentFilter.size());
-                            historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getTradingGranularity(),5000l)
+                            historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getLowTradingGranularity(),5000l)
                                     .map(cl->cl.stream().collect(Collectors.toList()))
-                                    .ifPresent(cdl->ti.setMarketHistory(cdl));
-                            ti.setPreviousMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
-                            ti.setCurrentMarket(ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
+                                    .ifPresent(cdl->ti.setLowTimeMarketHistory(cdl));
+                            historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getHighTradingGranularity(),5000l)
+                                    .map(cl->cl.stream().collect(Collectors.toList()))
+                                    .ifPresent(cdl->ti.setHighTimeMarketHistory(cdl));
+                            ti.setPreviousHighMarket(ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
+                            ti.setCurrentHighMarket(ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
+                            ti.setPreviousLowMarket(ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
+                            ti.setCurrentLowMarket(ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
                             portfolioStatus.getTradeInstrumentMap().put(ti.getTicker(),ti);
                         });
                 Set<String> homeBasePair = tradableInstrumentFilter.stream().flatMap(tp -> Stream.of(AppUtil.getBaseHomePair(tp, appConfigProperties.getBroker().getHomeCurrency())))

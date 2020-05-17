@@ -23,12 +23,20 @@ public class TradeInstrument {
     private double maxUnits = 0;
     private Instrument instrument;
     private BoundedLimitOrder currentOrder;
-    private CandlestickData previousMarket;
-    private CandlestickData currentMarket;
-    private List<Candlestick> marketHistory;
-    private CandlestickData previousPredicted;
-    private CandlestickData currentPredicted;
-    private double volume;
-    private IndicatorEMA emaIndicator = new IndicatorEMA(12,5);
-    private IndicatorStochastic stochasticIndicator = new IndicatorStochastic(10,6,6);
+    private CandlestickData previousLowMarket;
+    private CandlestickData currentLowMarket;
+    private CandlestickData previousHighMarket;
+    private CandlestickData currentHighMarket;
+    private List<Candlestick> lowTimeMarketHistory;
+    private List<Candlestick> highTimeMarketHistory;
+    private CandlestickData previousLowPredicted;
+    private CandlestickData currentLowPredicted;
+    private CandlestickData previousHighPredicted;
+    private CandlestickData currentHighPredicted;
+    private double dailyVolume = 0;
+    private Integer tradeDirection = 0;
+    private IndicatorEMA emaLowIndicator = new IndicatorEMA(12,5);
+    private IndicatorStochastic stochasticLowIndicator = new IndicatorStochastic(10,6,6);
+    private IndicatorEMA emaHighIndicator = new IndicatorEMA(12,5);
+    private IndicatorStochastic stochasticHighIndicator = new IndicatorStochastic(10,6,6);
 }

@@ -41,21 +41,73 @@ public class PortfolioStatus {
     private AccountID currentAccount;
     private Currency homeCurrency;
     private Account account;
-    private CandlestickGranularity tradingGranularity;
+    private CandlestickGranularity lowTradingGranularity;
+    private CandlestickGranularity highTradingGranularity;
     private List<Instrument> tradableInstruments;
     private Set<InstrumentName> allPairs = new HashSet<>();
 
     @PostConstruct
     public void initializePortfolioWarmingUp(){
-        Map<InstrumentName,List<Candlestick>> historyMap = new HashMap<>();
-        tradeInstrumentMap.values().forEach(ti->{
-            historyMap.put(ti.getInstrument().getName(),ti.getMarketHistory());
+        initializeWarmUpForGranularity(this.getLowTradingGranularity());
+        initializeWarmUpForGranularity(this.getHighTradingGranularity());
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public class CandlestickDataMiniBatch{
+        private CandlestickGranularity granularity;
+        private InstrumentName instrumentName;
+        private List<Candlestick> miniBatch;
+    }
+
+    private PortfolioStatus combineAllMinBatches(Object[] batches){
+        Arrays.stream(batches)
+                .map(e->(CandlestickDataMiniBatch)e)
+                .filter(e->e.getMiniBatch().size()==appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue())
+                .forEach(mb->{
+                    if(mb.getGranularity().equals(this.getLowTradingGranularity()))
+                        this.tradeInstrumentMap.get(mb.getInstrumentName().toString()).setLowTimeMarketHistory(mb.getMiniBatch());
+                    else if(mb.getGranularity().equals(this.getHighTradingGranularity()))
+                        this.tradeInstrumentMap.get(mb.getInstrumentName().toString()).setHighTimeMarketHistory(mb.getMiniBatch());
+                });
+        return this;
+    }
+
+    private void printPredictData(CandlestickGranularity granularity){
+        this.tradeInstrumentMap.values().forEach(ti->{
+            if(granularity.equals(this.getLowTradingGranularity()) && ti.getLowTimeMarketHistory() != null){
+                Candlestick currentMarket = ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
+                log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentLowPredicted().getO(),ti.getCurrentLowPredicted().getC(),ti.getCurrentLowPredicted().getH(),ti.getCurrentLowPredicted().getL(),ti.getEmaLowIndicator().getSlowEMA(),ti.getEmaLowIndicator().getFastEMA(),ti.getEmaLowIndicator().getCurrentSignal(),ti.getStochasticLowIndicator().getKP(),ti.getStochasticLowIndicator().getDP(),ti.getStochasticLowIndicator().getDnP());
+            }
+            else if(granularity.equals(this.getHighTradingGranularity()) && ti.getLowTimeMarketHistory() != null){
+                Candlestick currentMarket = ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
+                log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentHighPredicted().getO(),ti.getCurrentHighPredicted().getC(),ti.getCurrentHighPredicted().getH(),ti.getCurrentHighPredicted().getL(),ti.getEmaHighIndicator().getSlowEMA(),ti.getEmaHighIndicator().getFastEMA(),ti.getEmaHighIndicator().getCurrentSignal(),ti.getStochasticHighIndicator().getKP(),ti.getStochasticHighIndicator().getDP(),ti.getStochasticHighIndicator().getDnP());
+            }
         });
-        List<Flux<CandlestickDataMiniBatch>> AllMiniBatchFluxes = historyMap.keySet().stream().map(k -> Flux.fromIterable(historyMap.get(k)).buffer(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue(), 1).map(mb -> new CandlestickDataMiniBatch(k, mb))).collect(Collectors.toList());
+    }
+
+    private void initializeWarmUpForGranularity(CandlestickGranularity granularity){
+        Map<InstrumentName,List<Candlestick>> historyMap = new HashMap<>();
+        if(granularity.equals(this.getLowTradingGranularity())){
+            tradeInstrumentMap.values().forEach(ti->{
+                historyMap.put(ti.getInstrument().getName(),ti.getLowTimeMarketHistory());
+            });
+        }
+        else if(granularity.equals(this.getHighTradingGranularity())){
+            tradeInstrumentMap.values().forEach(ti->{
+                historyMap.put(ti.getInstrument().getName(),ti.getHighTimeMarketHistory());
+            });
+        }
+        List<Flux<CandlestickDataMiniBatch>> AllMiniBatchFluxes = historyMap.keySet().stream().map(k -> Flux.fromIterable(historyMap.get(k)).buffer(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue(), 1).map(mb -> new CandlestickDataMiniBatch(granularity,k, mb))).collect(Collectors.toList());
         Flux.zip(AllMiniBatchFluxes,this::combineAllMinBatches)
                 .doOnNext(ps->{
-                    predictService.getPredictionsForPortfolio(ps);
-                    printPredictData();
+                    if(granularity.equals(this.getLowTradingGranularity()))
+                        predictService.getPredictionsForPortfolio(this.getLowTradingGranularity(),ps);
+                    else if(granularity.equals(this.getHighTradingGranularity()))
+                        predictService.getPredictionsForPortfolio(this.getHighTradingGranularity(),ps);
+                    printPredictData(granularity);
                 })
                 .doOnComplete(()->{
                     this.setIsWarmingUp(false);
@@ -65,34 +117,5 @@ public class PortfolioStatus {
                     log.info("All trading instrument warming up started");
                 })
                 .subscribe();
-
-    }
-
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    public class CandlestickDataMiniBatch{
-        private InstrumentName instrumentName;
-        private List<Candlestick> miniBatch;
-    }
-
-    private PortfolioStatus combineAllMinBatches(Object[] batches){
-        Arrays.stream(batches)
-                .map(e->(CandlestickDataMiniBatch)e)
-                .filter(e->e.getMiniBatch().size()==appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue())
-                .forEach(mb->this.tradeInstrumentMap.get(mb.getInstrumentName().toString()).setMarketHistory(mb.getMiniBatch()));
-        return this;
-    }
-
-    private void printPredictData(){
-        this.tradeInstrumentMap.values().forEach(ti->{
-            if(ti.getCurrentMarket() != null){
-                Candlestick currentMarket = ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
-                //SIGNAL-INDICATE|Ticker|Close|Slow_EMA|Fast_EMA|KP|DP|DNP|eMA_Signal
-                //log.info("SIGNAL-INDICATE|{}|{}|{}|{}|{}|{}|{}|{}",ti.getInstrument().getName(),ti.getMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getC(),ti.getEmaIndicator().getSlowEMA(),ti.getEmaIndicator().getFastEMA(),ti.getStochasticIndicator().getKP(),ti.getStochasticIndicator().getDP(),ti.getStochasticIndicator().getDnP(),ti.getEmaIndicator().getCurrentSignal());
-                log.info("SIGNAL-INDICATE|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}",ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentPredicted().getO(),ti.getCurrentPredicted().getC(),ti.getCurrentPredicted().getH(),ti.getCurrentPredicted().getL(),ti.getEmaIndicator().getSlowEMA(),ti.getEmaIndicator().getFastEMA(),ti.getEmaIndicator().getCurrentSignal(),ti.getStochasticIndicator().getKP(),ti.getStochasticIndicator().getDP(),ti.getStochasticIndicator().getDnP());
-            }
-        });
     }
 }

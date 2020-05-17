@@ -128,8 +128,32 @@ public class OandaOrderService implements IOrderService{
         return Optional.empty();
     }
 
+    @Override
+    public OrderCreateResponse placeMarketOrder(AccountID accountID, InstrumentName instrument, double units) {
+        OrderCreateRequest request = new OrderCreateRequest(accountID);
+        MarketOrderRequest marketOrderRequest = new MarketOrderRequest();
+        marketOrderRequest.setInstrument(instrument);
+        marketOrderRequest.setUnits(units);
+        request.setOrder(marketOrderRequest);
+        try {
+            OrderCreateResponse orderCreateResponse = context.order.create(request);
+            log.info("Market order {} created for {} with units {}",orderCreateResponse.getOrderFillTransaction().getId(),instrument,units);
+            return orderCreateResponse;
+        } catch (RequestException e) {
+            log.error("RequestException while creating marker order for accountId:{},Instrument:{},Units:{},message:{}",accountID,instrument,units,e.getErrorMessage());
+        } catch (ExecuteException e) {
+            log.error("ExecuteException while creating marker order for accountId:{},Instrument:{},Units:{},message:{}",accountID,instrument,units,e.getMessage());
+        }
+        return null;
+    }
+
     public Optional<List<Order>> getOpenOrdersForCurrentAccount(){
         return getOpenOrders(currentAccount);
+    }
+
+    @Override
+    public OrderCreateResponse placeMarketOrderForCurrentAccount(InstrumentName instrument, double units) {
+        return placeMarketOrder(currentAccount,instrument,units);
     }
 
     @Override

@@ -20,12 +20,14 @@ app:
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
-      defaultResolution: H1
+      lowTimeFrame: M5
+      highTimeFrame: M10
       defaultPredictBatchLength: 48
       homeCurrency: SGD
-      leftMargin: 99982.0
+      leftMargin: 99700.0
       minCandleDiff: 0.001
-      orderPlacing: 0 0/5 * ? * *
+      orderPlacing: 0 0/5 * ? * MON-FRI
+      dailyPreparation: 0 10 0 ? * MON-FRI
       timeZone: Asia/Singapore
       supportedTickers:
         - ticker: GBP_USD
@@ -283,10 +285,10 @@ app:
       supportedResolutions:
         - symbol: M5
           minutes: 5
-          enabled: false
+          enabled: true
         - symbol: M10
           minutes: 10
-          enabled: false
+          enabled: true
         - symbol: M15
           minutes: 15
           enabled: false
@@ -295,7 +297,7 @@ app:
           enabled: false
         - symbol: H1
           hours: 1
-          enabled: true
+          enabled: false
         - symbol: H2
           hours: 2
           enabled: false

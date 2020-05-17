@@ -30,23 +30,27 @@ public class OandaPredictService implements IPredictService{
     @Override
     public void getPredictionsForPortfolio(CandlestickGranularity granularity, PortfolioStatus portfolioStatus){
         MultiPredictBatchForGranularity.Builder multiPredictBatch = MultiPredictBatchForGranularity.newBuilder().setGranularity(granularity.name());
-        List<PredictBatch> predictBatchList = portfolioStatus.getTradeInstrumentMap().values().stream().map(ti -> getPredictBatchForTradeInstrument(ti))
+        List<PredictBatch> predictBatchList = portfolioStatus.getTradeInstrumentMap().values().stream().map(ti -> getPredictBatchForTradeInstrument(ti,granularity,portfolioStatus))
                 .collect(Collectors.toList());
         multiPredictBatch.addAllBatches(predictBatchList);
         MultiPredictBatchForGranularity multiPredictBatchRequest = multiPredictBatch.build();
         MultiPredictedCandleForGranularity predictionForBatchResponse = predictClient.getPredictionForBatch(multiPredictBatchRequest);
-        updatePortfolioWithNewPredictions(portfolioStatus.getTradeInstrumentMap(),predictionForBatchResponse);
+        updatePortfolioWithNewPredictions(granularity,portfolioStatus,portfolioStatus.getTradeInstrumentMap(),predictionForBatchResponse);
     }
 
     @Override
     public void getPredictionsForPortfolio(PortfolioStatus portfolioStatus){
-        getPredictionsForPortfolio(portfolioStatus.getTradingGranularity(),portfolioStatus);
+        getPredictionsForPortfolio(portfolioStatus.getHighTradingGranularity(),portfolioStatus);
+        getPredictionsForPortfolio(portfolioStatus.getLowTradingGranularity(),portfolioStatus);
     }
 
-    private PredictBatch getPredictBatchForTradeInstrument(TradeInstrument ti){
+    private PredictBatch getPredictBatchForTradeInstrument(TradeInstrument ti,CandlestickGranularity granularity,PortfolioStatus portfolioStatus){
         PredictBatch.Builder predictBatchBuilder = PredictBatch.newBuilder();
         predictBatchBuilder.setTicker(ti.getInstrument().getName().toString());
-        predictBatchBuilder.addAllCandles(getCandleListForCurrentMarketHistory(ti.getMarketHistory()));
+        if(granularity.equals(portfolioStatus.getHighTradingGranularity()))
+            predictBatchBuilder.addAllCandles(getCandleListForCurrentMarketHistory(ti.getHighTimeMarketHistory()));
+        else if(granularity.equals(portfolioStatus.getLowTradingGranularity()))
+            predictBatchBuilder.addAllCandles(getCandleListForCurrentMarketHistory(ti.getLowTimeMarketHistory()));
         return predictBatchBuilder.build();
     }
     private List<Candle> getCandleListForCurrentMarketHistory(List<Candlestick> history){
@@ -60,7 +64,7 @@ public class OandaPredictService implements IPredictService{
         ).collect(Collectors.toList());
     }
 
-    private void updatePortfolioWithNewPredictions(Map<String, TradeInstrument> tradeInstrumentMap,MultiPredictedCandleForGranularity predictionForBatchResponse){
+    private void updatePortfolioWithNewPredictions(CandlestickGranularity granularity,PortfolioStatus portfolioStatus,Map<String, TradeInstrument> tradeInstrumentMap,MultiPredictedCandleForGranularity predictionForBatchResponse){
         predictionForBatchResponse.getCandlesList().stream().forEach(pc->{
             CandlestickData newPredict = new CandlestickData();
             newPredict.setO(pc.getPredicted().getOpen());
@@ -68,10 +72,18 @@ public class OandaPredictService implements IPredictService{
             newPredict.setH(pc.getPredicted().getHigh());
             newPredict.setL(pc.getPredicted().getLow());
             TradeInstrument tradeInstrument = tradeInstrumentMap.get(pc.getTicker());
-            tradeInstrument.setPreviousPredicted(tradeInstrument.getCurrentPredicted());
-            tradeInstrument.setCurrentPredicted(newPredict);
-            tradeInstrument.getEmaIndicator().update(pc);
-            tradeInstrument.getStochasticIndicator().update(pc);
+            if(granularity.equals(portfolioStatus.getHighTradingGranularity())){
+                tradeInstrument.setPreviousHighPredicted(tradeInstrument.getCurrentHighPredicted());
+                tradeInstrument.setCurrentHighPredicted(newPredict);
+                tradeInstrument.getEmaHighIndicator().update(pc);
+                tradeInstrument.getStochasticHighIndicator().update(pc);
+            }
+            else if(granularity.equals(portfolioStatus.getLowTradingGranularity())){
+                tradeInstrument.setPreviousLowPredicted(tradeInstrument.getCurrentLowPredicted());
+                tradeInstrument.setCurrentLowPredicted(newPredict);
+                tradeInstrument.getEmaLowIndicator().update(pc);
+                tradeInstrument.getStochasticLowIndicator().update(pc);
+            }
         });
     }
 }

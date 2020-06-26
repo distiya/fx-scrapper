@@ -20,18 +20,20 @@ app:
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
-      lowTimeFrame: M5
-      highTimeFrame: M10
+      lowTimeFrame: M2
+      highTimeFrame: M15
       defaultPredictBatchLength: 48
       homeCurrency: SGD
-      leftMargin: 99700.0
+      leftMargin: 99845.0
       minCandleDiff: 0.001
-      orderPlacing: 0 0/5 * ? * MON-FRI
-      dailyPreparation: 0 10 0 ? * MON-FRI
+      minTradeProfitPercentage: 10.0
+      orderPlacing: 10 0/2 * ? * MON-SAT
+      dailyPreparation: 0 10 0 ? * MON-SAT
+      highScreenScheduling: 10 0/15 * ? * MON-SAT
       timeZone: Asia/Singapore
       supportedTickers:
         - ticker: GBP_USD
-          enabled: false
+          enabled: true
         - ticker: USD_MXN
           enabled: false
         - ticker: XAG_USD
@@ -51,7 +53,7 @@ app:
         - ticker: XPT_USD
           enabled: false
         - ticker: EUR_USD
-          enabled: false
+          enabled: true
         - ticker: TRY_JPY
           enabled: false
         - ticker: GBP_JPY
@@ -89,7 +91,7 @@ app:
         - ticker: USD_DKK
           enabled: false
         - ticker: EUR_JPY
-          enabled: false
+          enabled: true
         - ticker: USD_NOK
           enabled: false
         - ticker: XAU_SGD
@@ -113,7 +115,7 @@ app:
         - ticker: USD_HUF
           enabled: false
         - ticker: EUR_CHF
-          enabled: false
+          enabled: true
         - ticker: AUD_NZD
           enabled: false
         - ticker: EUR_DKK
@@ -139,7 +141,7 @@ app:
         - ticker: NZD_JPY
           enabled: false
         - ticker: EUR_GBP
-          enabled: false
+          enabled: true
         - ticker: USD_SEK
           enabled: false
         - ticker: GBP_SGD
@@ -183,9 +185,9 @@ app:
         - ticker: EUR_PLN
           enabled: false
         - ticker: USD_CHF
-          enabled: false
+          enabled: true
         - ticker: GBP_CHF
-          enabled: false
+          enabled: true
         - ticker: USD_THB
           enabled: false
         - ticker: GBP_ZAR
@@ -213,7 +215,7 @@ app:
         - ticker: EUR_TRY
           enabled: false
         - ticker: USD_JPY
-          enabled: false
+          enabled: true
         - ticker: XAG_NZD
           enabled: false
         - ticker: AUD_CAD
@@ -221,7 +223,7 @@ app:
         - ticker: USD_CZK
           enabled: false
         - ticker: USD_CAD
-          enabled: false
+          enabled: true
         - ticker: AUD_JPY
           enabled: false
         - ticker: NL25_EUR
@@ -283,15 +285,21 @@ app:
         - ticker: NAS100_USD
           enabled: false
       supportedResolutions:
+        - symbol: M1
+          minutes: 1
+          enabled: false
+        - symbol: M2
+          minutes: 2
+          enabled: true
         - symbol: M5
           minutes: 5
-          enabled: true
+          enabled: false
         - symbol: M10
           minutes: 10
-          enabled: true
+          enabled: false
         - symbol: M15
           minutes: 15
-          enabled: false
+          enabled: true
         - symbol: M30
           minutes: 30
           enabled: false
@@ -325,6 +333,7 @@ app:
         - symbol: M
           months: 1
           enabled: false
+#Major currency pairs : EUR_USD,USD_JPY,USD_CAD,AUD_USD,EUR_GBP,EUR_JPY,EUR_CHF,GBP_CHF,GBP_USD,USD_CHF,USD_MXN
 ---
 spring:
   profiles: dev

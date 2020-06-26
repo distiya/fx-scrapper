@@ -48,8 +48,10 @@ public class PortfolioStatus {
 
     @PostConstruct
     public void initializePortfolioWarmingUp(){
-        initializeWarmUpForGranularity(this.getLowTradingGranularity());
-        initializeWarmUpForGranularity(this.getHighTradingGranularity());
+        //initializeWarmUpForGranularity(this.getLowTradingGranularity());
+        //initializeWarmUpForGranularity(this.getHighTradingGranularity());
+        this.setIsWarmingUp(false);
+        log.info("PortfolioStatus constructed");
     }
 
     @AllArgsConstructor
@@ -79,11 +81,16 @@ public class PortfolioStatus {
         this.tradeInstrumentMap.values().forEach(ti->{
             if(granularity.equals(this.getLowTradingGranularity()) && ti.getLowTimeMarketHistory() != null){
                 Candlestick currentMarket = ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
-                log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentLowPredicted().getO(),ti.getCurrentLowPredicted().getC(),ti.getCurrentLowPredicted().getH(),ti.getCurrentLowPredicted().getL(),ti.getEmaLowIndicator().getSlowEMA(),ti.getEmaLowIndicator().getFastEMA(),ti.getEmaLowIndicator().getCurrentSignal(),ti.getStochasticLowIndicator().getKP(),ti.getStochasticLowIndicator().getDP(),ti.getStochasticLowIndicator().getDnP());
+                ti.getCurrentEmaLowIndicator().update(currentMarket.getMid());
+                ti.getCurrentStochasticLowIndicator().update(currentMarket.getMid());
+                //ti.getCurrentEmaHighIndicator().getSlowEMA(),ti.getCurrentEmaHighIndicator().getFastEMA(),ti.getCurrentStochasticHighIndicator().getKP(),ti.getCurrentStochasticHighIndicator().getDP(),ti.getCurrentStochasticHighIndicator().getDnP()
+                log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentLowPredicted().getO(),ti.getCurrentLowPredicted().getC(),ti.getCurrentLowPredicted().getH(),ti.getCurrentLowPredicted().getL(),ti.getEmaLowIndicator().getSlowEMA(),ti.getEmaLowIndicator().getFastEMA(),ti.getStochasticLowIndicator().getKP(),ti.getStochasticLowIndicator().getDP(),ti.getStochasticLowIndicator().getDnP(),ti.getCurrentEmaLowIndicator().getSlowEMA(),ti.getCurrentEmaLowIndicator().getFastEMA(),ti.getCurrentStochasticLowIndicator().getKP(),ti.getCurrentStochasticLowIndicator().getDP(),ti.getCurrentStochasticLowIndicator().getDnP());
             }
             else if(granularity.equals(this.getHighTradingGranularity()) && ti.getLowTimeMarketHistory() != null){
                 Candlestick currentMarket = ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
-                log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentHighPredicted().getO(),ti.getCurrentHighPredicted().getC(),ti.getCurrentHighPredicted().getH(),ti.getCurrentHighPredicted().getL(),ti.getEmaHighIndicator().getSlowEMA(),ti.getEmaHighIndicator().getFastEMA(),ti.getEmaHighIndicator().getCurrentSignal(),ti.getStochasticHighIndicator().getKP(),ti.getStochasticHighIndicator().getDP(),ti.getStochasticHighIndicator().getDnP());
+                ti.getCurrentEmaHighIndicator().update(currentMarket.getMid());
+                ti.getCurrentStochasticHighIndicator().update(currentMarket.getMid());
+                log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentHighPredicted().getO(),ti.getCurrentHighPredicted().getC(),ti.getCurrentHighPredicted().getH(),ti.getCurrentHighPredicted().getL(),ti.getEmaHighIndicator().getSlowEMA(),ti.getEmaHighIndicator().getFastEMA(),ti.getStochasticHighIndicator().getKP(),ti.getStochasticHighIndicator().getDP(),ti.getStochasticHighIndicator().getDnP(),ti.getCurrentEmaHighIndicator().getSlowEMA(),ti.getCurrentEmaHighIndicator().getFastEMA(),ti.getCurrentStochasticHighIndicator().getKP(),ti.getCurrentStochasticHighIndicator().getDP(),ti.getCurrentStochasticHighIndicator().getDnP());
             }
         });
     }

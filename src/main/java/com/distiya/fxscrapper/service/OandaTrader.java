@@ -3,6 +3,7 @@ package com.distiya.fxscrapper.service;
 import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.domain.TradeInstrument;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
+import com.distiya.fxscrapper.strategy.ITradeStrategy;
 import com.distiya.fxscrapper.util.AppUtil;
 import com.oanda.v20.Context;
 import com.oanda.v20.account.AccountID;
@@ -66,7 +67,12 @@ public class OandaTrader implements ITrader{
     @Autowired
     private ITradeService tradeService;
 
+    @Autowired
+    private ITradeStrategy strategy;
+
     private Boolean isDailyPreparationCompleted = false;
+
+    private Boolean skipFirstTrade = false;
 
     @PostConstruct
     public void initialize(){
@@ -80,7 +86,7 @@ public class OandaTrader implements ITrader{
                 log.info("{}|Starting daily preparation",getCurrentTime());
                 isDailyPreparationCompleted = false;
                 updateAllDailyVolumes();
-                updateAllCurrentFraction();
+                //updateAllCurrentFraction();
                 isDailyPreparationCompleted = true;
                 log.info("{}|Ending daily preparation",getCurrentTime());
             }
@@ -98,11 +104,26 @@ public class OandaTrader implements ITrader{
                 accountService.getCurrentAccount().ifPresent(a->portfolioStatus.setAccount(a));
                 portfolioStatus.setMargin(portfolioStatus.getAccount().getMarginAvailable().doubleValue()-appConfigProperties.getBroker().getLeftMargin());
                 updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
-                updateAllMaxUnitCount();
-                predictService.getPredictionsForPortfolio(portfolioStatus.getLowTradingGranularity(),portfolioStatus);
-                predictService.getPredictionsForPortfolio(portfolioStatus.getHighTradingGranularity(),portfolioStatus);
-                placeAllOrders();
+                //updateAllMaxUnitCount();
+                //predictService.getPredictionsForPortfolio(portfolioStatus.getLowTradingGranularity(),portfolioStatus);
+                //predictService.getPredictionsForPortfolio(portfolioStatus.getHighTradingGranularity(),portfolioStatus);
+                //placeAllOrders();
+                strategy.trade();
                 log.info("{}|Ending trading",getCurrentTime());
+            }
+            catch (Exception e){
+                log.error("Error in trading : {}",e.getMessage());
+            }
+        }
+    }
+
+    @Scheduled(cron = "${app.config.broker.highScreenScheduling}")
+    public void scheduleForHighScreen(){
+        if(!this.portfolioStatus.getIsWarmingUp()){
+            try{
+                log.info("{}|Starting setting high screen candle history",getCurrentTime());
+                updateAllMarketCandlesForHighScreen(appConfigProperties.getBroker().getDefaultPredictBatchLength());
+                log.info("{}|Ending setting high screen candle history",getCurrentTime());
             }
             catch (Exception e){
                 log.error("Error in trading : {}",e.getMessage());
@@ -119,10 +140,15 @@ public class OandaTrader implements ITrader{
                         updateCurrentMarketCandle(count,cl,portfolioStatus.getTradeInstrumentMap(),t.toString(),portfolioStatus.getLowTradingGranularity());
                         updateCurrentMarketCandle(count,cl,portfolioStatus.getHomeInstrumentMap(),t.toString(),portfolioStatus.getLowTradingGranularity());
                     });
+        });
+    }
+
+    private void updateAllMarketCandlesForHighScreen(long count){
+        portfolioStatus.getAllPairs().stream().forEach(t->{
             historyService.requestHistory(t,portfolioStatus.getHighTradingGranularity(),count)
                     .ifPresent(cl->{
-                        updateCurrentMarketCandle(count,cl,portfolioStatus.getTradeInstrumentMap(),t.toString(),portfolioStatus.getLowTradingGranularity());
-                        updateCurrentMarketCandle(count,cl,portfolioStatus.getHomeInstrumentMap(),t.toString(),portfolioStatus.getLowTradingGranularity());
+                        updateCurrentMarketCandle(count,cl,portfolioStatus.getTradeInstrumentMap(),t.toString(),portfolioStatus.getHighTradingGranularity());
+                        updateCurrentMarketCandle(count,cl,portfolioStatus.getHomeInstrumentMap(),t.toString(),portfolioStatus.getHighTradingGranularity());
                     });
         });
     }
@@ -134,21 +160,25 @@ public class OandaTrader implements ITrader{
                 tradeInstrument.setPreviousLowMarket(cl.get(cl.size()-2).getMid());
                 tradeInstrument.setCurrentLowMarket(cl.get(cl.size()-1).getMid());
                 tradeInstrument.setLowTimeMarketHistory(cl);
+                tradeInstrument.getCurrentEmaLowIndicator().update(tradeInstrument.getCurrentLowMarket());
+                tradeInstrument.getCurrentStochasticLowIndicator().update(tradeInstrument.getCurrentLowMarket());
             }
             else if(granularity.equals(portfolioStatus.getHighTradingGranularity())){
                 TradeInstrument tradeInstrument = timap.get(key);
                 tradeInstrument.setPreviousHighMarket(cl.get(cl.size()-2).getMid());
                 tradeInstrument.setCurrentHighMarket(cl.get(cl.size()-1).getMid());
                 tradeInstrument.setHighTimeMarketHistory(cl);
+                tradeInstrument.getCurrentEmaHighIndicator().update(tradeInstrument.getCurrentHighMarket());
+                tradeInstrument.getCurrentStochasticHighIndicator().update(tradeInstrument.getCurrentHighMarket());
             }
         }
     }
 
     private void updateAllDailyVolumes(){
         portfolioStatus.getTradeInstrumentMap().values().stream().map(ti->ti.getInstrument().getName()).forEach(t->{
-            historyService.requestHistory(t,CandlestickGranularity.D,1l)
+            historyService.requestHistory(t,CandlestickGranularity.D,2l)
                     .ifPresent(cl->{
-                        updateCurrentDailyVolume(portfolioStatus.getTradeInstrumentMap(),t.toString(),cl.get(0).getVolume());
+                        updateCurrentDailyVolume(portfolioStatus.getTradeInstrumentMap(),t.toString(),cl.get(1).getVolume() >= 1 ? cl.get(1).getVolume() : cl.get(0).getVolume());
                     });
         });
     }
@@ -175,12 +205,13 @@ public class OandaTrader implements ITrader{
 
     private void placeAllOrders(){
         Optional<List<Trade>> currentOpenTrades = tradeService.getOpenTradesForCurrentAccount();
-        portfolioStatus.getTradeInstrumentMap().values().stream().filter(ti->ti.getMaxUnits() > 0).forEach(ti->placeOrderForTradeInstrument(ti,currentOpenTrades));
+        portfolioStatus.getTradeInstrumentMap().values().stream().filter(ti->ti.getMaxUnits() >= 1).forEach(ti->placeOrderForTradeInstrument(ti,currentOpenTrades));
     }
 
     private void placeOrderForTradeInstrument(TradeInstrument ti,Optional<List<Trade>> currentOpenTrades){
         Optional<Trade> currentOpenTradeForInstrument = currentOpenTrades.flatMap(otl -> otl.stream().filter(tr -> tr.getInstrument().equals(ti.getInstrument().getName())).findFirst());
         currentOpenTradeForInstrument.ifPresentOrElse(tr->{
+            log.info("Trade Exists - {}|{}|{}|{}|{}|{}|{}",tr.getCurrentUnits().doubleValue(),ti.getStochasticLowIndicator().getKP(),ti.getStochasticLowIndicator().getDP(),ti.getStochasticLowIndicator().getDnP(),ti.getStochasticHighIndicator().getKP(),ti.getStochasticHighIndicator().getDP(),ti.getStochasticHighIndicator().getDnP());
             if((tr.getCurrentUnits().doubleValue() > 0) && (ti.getStochasticLowIndicator().getKP() > ti.getStochasticHighIndicator().getKP()) && (ti.getStochasticLowIndicator().getDP() < ti.getStochasticHighIndicator().getKP())){
                 tradeService.closeTradeForCurrentAccount(tr.getId());
                 ti.setTradeDirection(-1);
@@ -192,13 +223,28 @@ public class OandaTrader implements ITrader{
                 log.info("Trade {} of {} closed and set trade direction buy only because KPL < KPH && DPL > KPH",tr.getId(),ti.getInstrument().getName());
             }
         },()->{
+            log.info("Entering Trade - {}|{}|{}|{}|{}|{}",ti.getStochasticLowIndicator().getKP(),ti.getStochasticLowIndicator().getDP(),ti.getStochasticLowIndicator().getDnP(),ti.getStochasticHighIndicator().getKP(),ti.getStochasticHighIndicator().getDP(),ti.getStochasticHighIndicator().getDnP());
             if((ti.getTradeDirection().equals(1) || ti.getTradeDirection().equals(0)) && (ti.getStochasticLowIndicator().getKP() > ti.getStochasticHighIndicator().getKP()) && (ti.getStochasticHighIndicator().getKP() > ti.getStochasticHighIndicator().getDnP())){
-                OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * 1.0);
-                log.info("Buy market order placed for {} because KPL > KPH && KPH > DnPH",ti.getInstrument().getName());
+                if(skipFirstTrade){
+                    OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * 1.0);
+                    log.info("Buy market order placed for {} because KPL > KPH && KPH > DnPH",ti.getInstrument().getName());
+                }
+                else{
+                    ti.setTradeDirection(-1);
+                    skipFirstTrade = true;
+                    log.info("Skipped first buy signal and set next signal type as sell for instrument {}",ti.getInstrument().getName());
+                }
             }
             else if((ti.getTradeDirection().equals(-1) || ti.getTradeDirection().equals(0)) && (ti.getStochasticLowIndicator().getKP() < ti.getStochasticHighIndicator().getKP()) && (ti.getStochasticLowIndicator().getKP() < ti.getStochasticLowIndicator().getDnP())){
-                OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * -1.0);
-                log.info("Sell market order placed for {} because KPL < KPH && KPL < DnPL",ti.getInstrument().getName());
+                if(skipFirstTrade){
+                    OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * -1.0);
+                    log.info("Sell market order placed for {} because KPL < KPH && KPL < DnPL",ti.getInstrument().getName());
+                }
+                else{
+                    ti.setTradeDirection(1);
+                    skipFirstTrade = true;
+                    log.info("Skipped first sell signal and set next signal type as buy for instrument {}",ti.getInstrument().getName());
+                }
             }
         });
     }

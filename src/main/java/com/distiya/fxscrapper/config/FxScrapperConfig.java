@@ -1,6 +1,8 @@
 package com.distiya.fxscrapper.config;
 
 import com.distiya.fxscrapper.domain.PortfolioStatus;
+import com.distiya.fxscrapper.indicator.IndicatorEMA;
+import com.distiya.fxscrapper.indicator.IndicatorStochastic;
 import com.distiya.fxscrapper.predict.FxPredictGrpc;
 import com.distiya.fxscrapper.properties.AppConfigProperties;
 import com.distiya.fxscrapper.service.IAccountService;
@@ -10,6 +12,7 @@ import com.distiya.fxscrapper.util.AppUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oanda.v20.Context;
 import com.oanda.v20.account.AccountID;
+import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.primitives.Currency;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -21,6 +24,7 @@ import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -90,6 +94,8 @@ public class FxScrapperConfig {
                             historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getHighTradingGranularity(),5000l)
                                     .map(cl->cl.stream().collect(Collectors.toList()))
                                     .ifPresent(cdl->ti.setHighTimeMarketHistory(cdl));
+                            updateCurrentIndicators(ti.getLowTimeMarketHistory(),ti.getCurrentStochasticLowIndicator(),ti.getCurrentEmaLowIndicator());
+                            updateCurrentIndicators(ti.getHighTimeMarketHistory(),ti.getCurrentStochasticHighIndicator(),ti.getCurrentEmaHighIndicator());
                             ti.setPreviousHighMarket(ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
                             ti.setCurrentHighMarket(ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
                             ti.setPreviousLowMarket(ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
@@ -109,6 +115,14 @@ public class FxScrapperConfig {
             }
         });
         return portfolioStatus;
+    }
+
+    private void updateCurrentIndicators(List<Candlestick> cl, IndicatorStochastic stochastic, IndicatorEMA ema){
+        cl.stream().forEach(cs->{
+            stochastic.update(cs.getMid());
+            ema.update(cs.getMid());
+            stochastic.resetLevels();
+        });
     }
 
     @Bean

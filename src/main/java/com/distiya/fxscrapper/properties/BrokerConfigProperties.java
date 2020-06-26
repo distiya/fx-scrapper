@@ -30,11 +30,14 @@ public class BrokerConfigProperties {
     private Long defaultPredictBatchLength = 48l;
     private String homeCurrency = "SGD";
     private String orderPlacing = "0 0/5 * ? * *";
+    private String highScreenScheduling = "0 0/5 * ? * *";
+    private String dailyPreparation = "0 0/5 * ? * *";
     private Boolean tradingMode = false;
     private Boolean scrappingMode = false;
     private Boolean streamingMode = false;
     private Double leftMargin = 0.0;
     private Double minCandleDiff = 0.002;
+    private Double minTradeProfitPercentage = 0.1;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate startDate = LocalDate.now();
     private List<SupportedTickerProperties> supportedTickers = new ArrayList<>();

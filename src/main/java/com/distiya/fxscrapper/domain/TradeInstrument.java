@@ -35,8 +35,23 @@ public class TradeInstrument {
     private CandlestickData currentHighPredicted;
     private double dailyVolume = 0;
     private Integer tradeDirection = 0;
-    private IndicatorEMA emaLowIndicator = new IndicatorEMA(12,5);
-    private IndicatorStochastic stochasticLowIndicator = new IndicatorStochastic(10,6,6);
-    private IndicatorEMA emaHighIndicator = new IndicatorEMA(12,5);
-    private IndicatorStochastic stochasticHighIndicator = new IndicatorStochastic(10,6,6);
+    private IndicatorEMA emaLowIndicator = new IndicatorEMA(12,5,"PredictedLowScreenEMA",instrument);
+    private IndicatorStochastic stochasticLowIndicator = new IndicatorStochastic(10,6,6,"PredictedLowScreenStochastic",instrument);
+    private IndicatorEMA emaHighIndicator = new IndicatorEMA(12,5,"PredictedHighScreenEMA",instrument);
+    private IndicatorStochastic stochasticHighIndicator = new IndicatorStochastic(10,6,6,"PredictedHighScreenStochastic",instrument);
+    private IndicatorEMA currentEmaLowIndicator = new IndicatorEMA(12,5,"CurrentLowScreenEMA",instrument);
+    private IndicatorStochastic currentStochasticLowIndicator = new IndicatorStochastic(10,6,6,"CurrentLowScreenStochastic",instrument);
+    private IndicatorEMA currentEmaHighIndicator = new IndicatorEMA(12,5,"CurrentHighScreenEMA",instrument);
+    private IndicatorStochastic currentStochasticHighIndicator = new IndicatorStochastic(10,6,6,"CurrentHighScreenStochastic",instrument);
+
+    public void updateIndicators(){
+        emaLowIndicator.setInstrument(instrument);
+        stochasticLowIndicator.setInstrument(instrument);
+        emaHighIndicator.setInstrument(instrument);
+        stochasticHighIndicator.setInstrument(instrument);
+        currentEmaLowIndicator.setInstrument(instrument);
+        currentStochasticLowIndicator.setInstrument(instrument);
+        currentEmaHighIndicator.setInstrument(instrument);
+        currentStochasticHighIndicator.setInstrument(instrument);
+    }
 }

@@ -8,6 +8,7 @@ import com.oanda.v20.primitives.Instrument;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static com.distiya.fxscrapper.constant.Constants.*;
 
@@ -22,6 +23,8 @@ public class AppUtil {
 
     public static CandlestickGranularity getCandlestickGranularity(String res){
         switch (res){
+            case "M1":return CandlestickGranularity.M1;
+            case "M2":return CandlestickGranularity.M2;
             case "M10":return CandlestickGranularity.M10;
             case "M15":return CandlestickGranularity.M15;
             case "M30":return CandlestickGranularity.M30;
@@ -44,6 +47,7 @@ public class AppUtil {
         TradeInstrument ti = new TradeInstrument();
         ti.setTicker(instrument.getName().toString());
         ti.setInstrument(instrument);
+        ti.updateIndicators();
         return ti;
     }
 
@@ -86,5 +90,18 @@ public class AppUtil {
 
     public static Double formatPrice(Double inputPrice){
         return Double.valueOf(priceFormat.format(inputPrice));
+    }
+
+    public static void updateAllCurrentFraction(List<TradeInstrument> tradableInstruments){
+        double totalFraction = tradableInstruments.stream().mapToDouble(ti->ti.getDailyVolume()).sum();
+        tradableInstruments.stream().forEach(ti->{
+            ti.setCurrentFraction(totalFraction > 0 ? ti.getDailyVolume()/totalFraction : 0.0);
+        });
+    }
+
+    public static void updateAllMaxUnitCount(List<TradeInstrument> tradableInstruments,PortfolioStatus portfolioStatus){
+        tradableInstruments.stream().forEach(ti->{
+            AppUtil.getUnitCount(ti.getInstrument().getName().toString(),portfolioStatus);
+        });
     }
 }

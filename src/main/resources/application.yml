@@ -4,7 +4,7 @@ spring:
   profiles:
     active: test
 server:
-  port: 9999
+  port: 8080
 app:
   config:
     predictService:
@@ -16,6 +16,7 @@ app:
       tradingMode: true
       scrappingMode: false
       streamingMode: true
+      skipFutureTrades: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/

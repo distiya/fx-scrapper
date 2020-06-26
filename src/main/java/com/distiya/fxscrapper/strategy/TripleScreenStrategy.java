@@ -102,21 +102,23 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private void openEligibleTrades(){
-        List<InstrumentName> openTradeInstruments = tradeService.getOpenTradesForCurrentAccount().map(trl -> trl.stream().map(tr -> tr.getInstrument()).collect(Collectors.toList())).orElse(null);
-        List<TradeInstrument> tradableInstruments;
-        if(openTradeInstruments != null && !openTradeInstruments.isEmpty()){
-            tradableInstruments = portfolioStatus.getTradeInstrumentMap().values().stream()
-                    .filter(ti -> !openTradeInstruments.contains(ti.getInstrument().getName()))
-                    .filter(ti->tradeOpeningAvailability(ti))
-                    .collect(Collectors.toList());
-        }
-        else{
-            tradableInstruments = portfolioStatus.getTradeInstrumentMap().values().stream().filter(ti->tradeOpeningAvailability(ti)).collect(Collectors.toList());
-        }
-        if(tradableInstruments != null && !tradableInstruments.isEmpty()){
-            AppUtil.updateAllCurrentFraction(tradableInstruments);
-            AppUtil.updateAllMaxUnitCount(tradableInstruments,portfolioStatus);
-            openAllEligibleTrades(tradableInstruments);
+        if(Boolean.FALSE.equals(appConfigProperties.getBroker().getSkipFutureTrades())){
+            List<InstrumentName> openTradeInstruments = tradeService.getOpenTradesForCurrentAccount().map(trl -> trl.stream().map(tr -> tr.getInstrument()).collect(Collectors.toList())).orElse(null);
+            List<TradeInstrument> tradableInstruments;
+            if(openTradeInstruments != null && !openTradeInstruments.isEmpty()){
+                tradableInstruments = portfolioStatus.getTradeInstrumentMap().values().stream()
+                        .filter(ti -> !openTradeInstruments.contains(ti.getInstrument().getName()))
+                        .filter(ti->tradeOpeningAvailability(ti))
+                        .collect(Collectors.toList());
+            }
+            else{
+                tradableInstruments = portfolioStatus.getTradeInstrumentMap().values().stream().filter(ti->tradeOpeningAvailability(ti)).collect(Collectors.toList());
+            }
+            if(tradableInstruments != null && !tradableInstruments.isEmpty()){
+                AppUtil.updateAllCurrentFraction(tradableInstruments);
+                AppUtil.updateAllMaxUnitCount(tradableInstruments,portfolioStatus);
+                openAllEligibleTrades(tradableInstruments);
+            }
         }
     }
 

@@ -65,8 +65,8 @@ public class AppUtil {
         if(portfolioStatus.getHomeInstrumentMap().containsKey(baseHomePair[0])){
             baseHomeRate = portfolioStatus.getHomeInstrumentMap().get(baseHomePair[0]).getCurrentLowMarket().getC().doubleValue();
         }
-        else if(portfolioStatus.getHomeInstrumentMap().containsKey(baseHomePair[0])){
-            baseHomeRate = 1.0/portfolioStatus.getHomeInstrumentMap().get(baseHomePair[0]).getCurrentLowMarket().getC().doubleValue();
+        else if(portfolioStatus.getHomeInstrumentMap().containsKey(baseHomePair[1])){
+            baseHomeRate = 1.0/portfolioStatus.getHomeInstrumentMap().get(baseHomePair[1]).getCurrentLowMarket().getC().doubleValue();
         }
         if(portfolioStatus.getTradeInstrumentMap().containsKey(instrument)){
             TradeInstrument tradeInstrument = portfolioStatus.getTradeInstrumentMap().get(instrument);

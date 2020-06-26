@@ -96,10 +96,12 @@ public class FxScrapperConfig {
                                     .ifPresent(cdl->ti.setHighTimeMarketHistory(cdl));
                             updateCurrentIndicators(ti.getLowTimeMarketHistory(),ti.getCurrentStochasticLowIndicator(),ti.getCurrentEmaLowIndicator());
                             updateCurrentIndicators(ti.getHighTimeMarketHistory(),ti.getCurrentStochasticHighIndicator(),ti.getCurrentEmaHighIndicator());
-                            ti.setPreviousHighMarket(ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
-                            ti.setCurrentHighMarket(ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
-                            ti.setPreviousLowMarket(ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-2).getMid());
-                            ti.setCurrentLowMarket(ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue()-1).getMid());
+                            ti.setLastLowCandleUpdatedTime(ti.getLowTimeMarketHistory().get(ti.getLowTimeMarketHistory().size()-1).getTime());
+                            ti.setLastHighCandleUpdatedTime(ti.getHighTimeMarketHistory().get(ti.getHighTimeMarketHistory().size()-1).getTime());
+                            ti.setPreviousHighMarket(ti.getHighTimeMarketHistory().get(ti.getHighTimeMarketHistory().size()-2).getMid());
+                            ti.setCurrentHighMarket(ti.getHighTimeMarketHistory().get(ti.getHighTimeMarketHistory().size()-1).getMid());
+                            ti.setPreviousLowMarket(ti.getLowTimeMarketHistory().get(ti.getLowTimeMarketHistory().size()-2).getMid());
+                            ti.setCurrentLowMarket(ti.getLowTimeMarketHistory().get(ti.getLowTimeMarketHistory().size()-1).getMid());
                             portfolioStatus.getTradeInstrumentMap().put(ti.getTicker(),ti);
                         });
                 Set<String> homeBasePair = tradableInstrumentFilter.stream().flatMap(tp -> Stream.of(AppUtil.getBaseHomePair(tp, appConfigProperties.getBroker().getHomeCurrency())))

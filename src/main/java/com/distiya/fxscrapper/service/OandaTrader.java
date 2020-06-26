@@ -10,6 +10,7 @@ import com.oanda.v20.account.AccountID;
 import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.CandlestickGranularity;
 import com.oanda.v20.order.OrderCreateResponse;
+import com.oanda.v20.primitives.DateTime;
 import com.oanda.v20.trade.Trade;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -155,21 +156,28 @@ public class OandaTrader implements ITrader{
 
     private void updateCurrentMarketCandle(long count, List<Candlestick> cl, Map<String, TradeInstrument> timap, String key, CandlestickGranularity granularity){
         if(cl.size() == count && timap.containsKey(key)){
+            DateTime lastCandleTime = cl.get(cl.size() - 1).getTime();
             if(granularity.equals(portfolioStatus.getLowTradingGranularity())){
                 TradeInstrument tradeInstrument = timap.get(key);
-                tradeInstrument.setPreviousLowMarket(cl.get(cl.size()-2).getMid());
-                tradeInstrument.setCurrentLowMarket(cl.get(cl.size()-1).getMid());
-                tradeInstrument.setLowTimeMarketHistory(cl);
-                tradeInstrument.getCurrentEmaLowIndicator().update(tradeInstrument.getCurrentLowMarket());
-                tradeInstrument.getCurrentStochasticLowIndicator().update(tradeInstrument.getCurrentLowMarket());
+                if(tradeInstrument.getLastLowCandleUpdatedTime() == null || !lastCandleTime.equals(tradeInstrument.getLastLowCandleUpdatedTime())){
+                    tradeInstrument.setPreviousLowMarket(cl.get(cl.size()-2).getMid());
+                    tradeInstrument.setCurrentLowMarket(cl.get(cl.size()-1).getMid());
+                    tradeInstrument.setLowTimeMarketHistory(cl);
+                    tradeInstrument.getCurrentEmaLowIndicator().update(tradeInstrument.getCurrentLowMarket());
+                    tradeInstrument.getCurrentStochasticLowIndicator().update(tradeInstrument.getCurrentLowMarket());
+                    tradeInstrument.setLastLowCandleUpdatedTime(lastCandleTime);
+                }
             }
             else if(granularity.equals(portfolioStatus.getHighTradingGranularity())){
                 TradeInstrument tradeInstrument = timap.get(key);
-                tradeInstrument.setPreviousHighMarket(cl.get(cl.size()-2).getMid());
-                tradeInstrument.setCurrentHighMarket(cl.get(cl.size()-1).getMid());
-                tradeInstrument.setHighTimeMarketHistory(cl);
-                tradeInstrument.getCurrentEmaHighIndicator().update(tradeInstrument.getCurrentHighMarket());
-                tradeInstrument.getCurrentStochasticHighIndicator().update(tradeInstrument.getCurrentHighMarket());
+                if(tradeInstrument.getLastHighCandleUpdatedTime() == null || !lastCandleTime.equals(tradeInstrument.getLastHighCandleUpdatedTime())){
+                    tradeInstrument.setPreviousHighMarket(cl.get(cl.size()-2).getMid());
+                    tradeInstrument.setCurrentHighMarket(cl.get(cl.size()-1).getMid());
+                    tradeInstrument.setHighTimeMarketHistory(cl);
+                    tradeInstrument.getCurrentEmaHighIndicator().update(tradeInstrument.getCurrentHighMarket());
+                    tradeInstrument.getCurrentStochasticHighIndicator().update(tradeInstrument.getCurrentHighMarket());
+                    tradeInstrument.setLastHighCandleUpdatedTime(lastCandleTime);
+                }
             }
         }
     }

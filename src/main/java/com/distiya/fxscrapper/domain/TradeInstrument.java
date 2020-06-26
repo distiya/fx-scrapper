@@ -4,6 +4,7 @@ import com.distiya.fxscrapper.indicator.IndicatorEMA;
 import com.distiya.fxscrapper.indicator.IndicatorStochastic;
 import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.CandlestickData;
+import com.oanda.v20.primitives.DateTime;
 import com.oanda.v20.primitives.Instrument;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,8 @@ public class TradeInstrument {
     private CandlestickData currentLowPredicted;
     private CandlestickData previousHighPredicted;
     private CandlestickData currentHighPredicted;
+    private DateTime lastLowCandleUpdatedTime;
+    private DateTime lastHighCandleUpdatedTime;
     private double dailyVolume = 0;
     private Integer tradeDirection = 0;
     private IndicatorEMA emaLowIndicator = new IndicatorEMA(12,5,"PredictedLowScreenEMA",instrument);

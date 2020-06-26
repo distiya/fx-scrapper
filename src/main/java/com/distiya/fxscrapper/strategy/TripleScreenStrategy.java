@@ -50,9 +50,9 @@ public class TripleScreenStrategy implements ITradeStrategy{
         currentOpenTrades.ifPresent(otl->{
             otl.stream()
                     .forEach(tr->{
-                        log.info("OpenTrade|{}|UPL : {}|RPL : {}|MU : {}",tr.getInstrument(),tr.getUnrealizedPL().doubleValue(),tr.getRealizedPL().doubleValue(),tr.getMarginUsed().doubleValue());
+                        log.info("OpenTrade|{}|UPL : {}|RPL : {}|IMR : {}",tr.getInstrument(),tr.getUnrealizedPL().doubleValue(),tr.getRealizedPL().doubleValue(),tr.getInitialMarginRequired().doubleValue());
                         TradeInstrument ti = portfolioStatus.getTradeInstrumentMap().get(tr.getInstrument());
-                        double tradeCurrentProfitPercentage = (tr.getUnrealizedPL().doubleValue() / tr.getMarginUsed().doubleValue()) * 100.0;
+                        double tradeCurrentProfitPercentage = (tr.getUnrealizedPL().doubleValue() / tr.getInitialMarginRequired().doubleValue()) * 100.0;
                         if(tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0))){
                             tradeService.closeTradeForCurrentAccount(tr.getId());
                         }

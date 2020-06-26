@@ -50,9 +50,9 @@ public class TripleScreenStrategy implements ITradeStrategy{
         currentOpenTrades.ifPresent(otl->{
             otl.stream()
                     .forEach(tr->{
-                        log.info("OpenTrade|{}|UPL : {}|RPL : {}|IMR : {}",tr.getInstrument(),tr.getUnrealizedPL().doubleValue(),tr.getRealizedPL().doubleValue(),tr.getInitialMarginRequired().doubleValue());
-                        TradeInstrument ti = portfolioStatus.getTradeInstrumentMap().get(tr.getInstrument());
                         double tradeCurrentProfitPercentage = (tr.getUnrealizedPL().doubleValue() / tr.getInitialMarginRequired().doubleValue()) * 100.0;
+                        log.info("OpenTrade|{}|Unrealized Profit&Loss : {}|Current Profit Percentage : {}|Expected Profit Percentage : {}",tr.getInstrument(),tr.getUnrealizedPL().doubleValue(),tradeCurrentProfitPercentage,appConfigProperties.getBroker().getMinTradeProfitPercentage());
+                        TradeInstrument ti = portfolioStatus.getTradeInstrumentMap().get(tr.getInstrument());
                         if(tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0))){
                             tradeService.closeTradeForCurrentAccount(tr.getId());
                         }
@@ -103,6 +103,7 @@ public class TripleScreenStrategy implements ITradeStrategy{
 
     private void openEligibleTrades(){
         if(Boolean.FALSE.equals(appConfigProperties.getBroker().getSkipFutureTrades())){
+            log.info("Further trading has been turned on");
             List<InstrumentName> openTradeInstruments = tradeService.getOpenTradesForCurrentAccount().map(trl -> trl.stream().map(tr -> tr.getInstrument()).collect(Collectors.toList())).orElse(null);
             List<TradeInstrument> tradableInstruments;
             if(openTradeInstruments != null && !openTradeInstruments.isEmpty()){
@@ -120,6 +121,10 @@ public class TripleScreenStrategy implements ITradeStrategy{
                 openAllEligibleTrades(tradableInstruments);
             }
         }
+        else{
+            log.info("Further trading has been turned off");
+        }
+
     }
 
     private void openAllEligibleTrades(List<TradeInstrument> tradableInstruments){

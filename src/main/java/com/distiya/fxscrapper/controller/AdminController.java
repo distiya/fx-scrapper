@@ -25,6 +25,20 @@ public class AdminController {
         if(adminConfig.getLeftMarginAmount() != null && adminConfig.getLeftMarginAmount() > 0)
             appConfigProperties.getBroker().setLeftMargin(adminConfig.getLeftMarginAmount());
         log.info("Setting admin config completed");
-        return adminConfig;
+        return convertToAdminConfig(appConfigProperties);
+    }
+
+    @GetMapping(value = "/config",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody  AdminConfig changeConfig(){
+        log.info("Getting admin config started");
+        return convertToAdminConfig(appConfigProperties);
+    }
+
+    private AdminConfig convertToAdminConfig(AppConfigProperties appConfigProperties){
+        AdminConfig config = new AdminConfig();
+        config.setLeftMarginAmount(appConfigProperties.getBroker().getLeftMargin());
+        config.setSkipFutureTrades(appConfigProperties.getBroker().getSkipFutureTrades());
+        config.setTakeProfitPercentage(appConfigProperties.getBroker().getMinTradeProfitPercentage());
+        return config;
     }
 }

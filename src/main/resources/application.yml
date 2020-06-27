@@ -16,6 +16,7 @@ app:
       tradingMode: true
       scrappingMode: false
       streamingMode: true
+      streamingSubscriber: false
       skipFutureTrades: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}

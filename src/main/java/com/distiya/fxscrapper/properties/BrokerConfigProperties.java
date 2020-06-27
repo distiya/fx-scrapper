@@ -35,6 +35,7 @@ public class BrokerConfigProperties {
     private Boolean tradingMode = false;
     private Boolean scrappingMode = false;
     private Boolean streamingMode = false;
+    private Boolean streamingSubscriber = false;
     private Boolean skipFutureTrades = false;
     private Double leftMargin = 0.0;
     private Double minCandleDiff = 0.002;

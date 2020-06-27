@@ -17,6 +17,7 @@ import com.oanda.v20.primitives.Currency;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -54,6 +55,7 @@ public class FxScrapperConfig {
         return new Jackson2JsonDecoder(objectMapper);
     }
 
+    @ConditionalOnProperty(prefix = "app.config.broker",name = "streamingMode",havingValue = "true")
     @Bean("streamWebClient")
     public WebClient getStreamWebClient(Jackson2JsonDecoder jackson2JsonDecoder){
         return WebClient.builder()
@@ -67,7 +69,7 @@ public class FxScrapperConfig {
     @Bean("portfolioStatus")
     @DependsOn("oandaContext")
     public PortfolioStatus createPortfolioStatus(AccountID currentAccount,IAccountService accountService,IHistoryService historyService){
-        if(streamService != null)
+        if(streamService != null && appConfigProperties.getBroker().getStreamingSubscriber())
             streamService.getTransactions().subscribe();
         PortfolioStatus portfolioStatus = new PortfolioStatus();
         accountService.getAccount(currentAccount).ifPresent(a->{

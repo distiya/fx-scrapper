@@ -41,8 +41,24 @@ public class TripleScreenStrategy implements ITradeStrategy{
 
     @Override
     public void trade() {
+        updateLastTradeCloseSignalForNonOpenedTradeInstruments();
         closeEligibleTrades();
         openEligibleTrades();
+    }
+
+    private void updateLastTradeCloseSignalForNonOpenedTradeInstruments(){
+        portfolioStatus.getTradeInstrumentMap().values().stream()
+                .filter(ti->ti.getOpenedTradeCount() == 0)
+                .forEach(ti-> updateLastTradeCloseSignal(ti));
+    }
+
+    private void updateLastTradeCloseSignal(TradeInstrument ti){
+        if(getUpperScreenTrend(ti) > 0 && tradeClosableStatus(ti) < 0){
+            ti.setLastTradeCloseSignal(1);
+        }
+        else if(getUpperScreenTrend(ti) < 0 && tradeClosableStatus(ti) > 0){
+            ti.setLastTradeCloseSignal(-1);
+        }
     }
 
     private void closeEligibleTrades(){
@@ -55,6 +71,7 @@ public class TripleScreenStrategy implements ITradeStrategy{
                         TradeInstrument ti = portfolioStatus.getTradeInstrumentMap().get(tr.getInstrument());
                         if(tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0))){
                             tradeService.closeTradeForCurrentAccount(tr.getId());
+                            updateLastTradeCloseSignal(ti);
                         }
                     });
         });
@@ -79,9 +96,9 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private int tradeEnterStatus(TradeInstrument ti){
-        if(ti.getCurrentStochasticLowIndicator().getKP() < ti.getCurrentStochasticLowIndicator().getDP())
+        if(ti.getLastTradeCloseSignal() > 0 && ti.getCurrentStochasticLowIndicator().getKP() < ti.getCurrentStochasticLowIndicator().getDP())
             return -1;
-        if(ti.getCurrentStochasticLowIndicator().getKP() > ti.getCurrentStochasticLowIndicator().getDP())
+        if(ti.getLastTradeCloseSignal() < 0 && ti.getCurrentStochasticLowIndicator().getKP() > ti.getCurrentStochasticLowIndicator().getDP())
             return 1;
         else
             return 0;
@@ -133,11 +150,15 @@ public class TripleScreenStrategy implements ITradeStrategy{
                 log.info("Opening a buy order with total fraction for {} is {}",ti.getInstrument().getName(),ti.getCurrentFraction());
                 OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * 1.0);
                 ti.getCurrentStochasticLowIndicator().resetLevels();
+                ti.setLastTradeCloseSignal(0);
+                ti.incrementOpenedTradeCount();
             }
             else if(tradeOpeningStatus(ti) < 0){
                 log.info("Opening a sell order with total fraction for {} is {}",ti.getInstrument().getName(),ti.getCurrentFraction());
                 OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * -1.0);
                 ti.getCurrentStochasticLowIndicator().resetLevels();
+                ti.setLastTradeCloseSignal(0);
+                ti.incrementOpenedTradeCount();
             }
         });
     }

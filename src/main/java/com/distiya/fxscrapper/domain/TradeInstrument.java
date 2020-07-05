@@ -37,15 +37,19 @@ public class TradeInstrument {
     private DateTime lastLowCandleUpdatedTime;
     private DateTime lastHighCandleUpdatedTime;
     private double dailyVolume = 0;
+    private Long openedTradeCount = 0l;
     private Integer tradeDirection = 0;
+    private Integer lastTradeCloseSignal = 0;
     private IndicatorEMA emaLowIndicator = new IndicatorEMA(12,5,"PredictedLowScreenEMA",instrument);
     private IndicatorStochastic stochasticLowIndicator = new IndicatorStochastic(10,6,6,"PredictedLowScreenStochastic",instrument);
     private IndicatorEMA emaHighIndicator = new IndicatorEMA(12,5,"PredictedHighScreenEMA",instrument);
     private IndicatorStochastic stochasticHighIndicator = new IndicatorStochastic(10,6,6,"PredictedHighScreenStochastic",instrument);
     private IndicatorEMA currentEmaLowIndicator = new IndicatorEMA(12,5,"CurrentLowScreenEMA",instrument);
     private IndicatorStochastic currentStochasticLowIndicator = new IndicatorStochastic(10,6,6,"CurrentLowScreenStochastic",instrument);
+    private IndicatorStochastic exCurrentStochasticLowIndicator = new IndicatorStochastic(10,6,6,"CurrentLowScreenStochastic",instrument);
     private IndicatorEMA currentEmaHighIndicator = new IndicatorEMA(12,5,"CurrentHighScreenEMA",instrument);
     private IndicatorStochastic currentStochasticHighIndicator = new IndicatorStochastic(10,6,6,"CurrentHighScreenStochastic",instrument);
+    private IndicatorStochastic exCurrentStochasticHighIndicator = new IndicatorStochastic(10,6,6,"CurrentHighScreenStochastic",instrument);
 
     public void updateIndicators(){
         emaLowIndicator.setInstrument(instrument);
@@ -56,5 +60,12 @@ public class TradeInstrument {
         currentStochasticLowIndicator.setInstrument(instrument);
         currentEmaHighIndicator.setInstrument(instrument);
         currentStochasticHighIndicator.setInstrument(instrument);
+    }
+
+    public void incrementOpenedTradeCount(){
+        if(Long.MAX_VALUE == openedTradeCount.longValue())
+            openedTradeCount = 1l;
+        else
+            openedTradeCount ++;
     }
 }

@@ -24,10 +24,13 @@ public class IndicatorStochastic implements ITechnicalIndicator{
     @Getter
     private Boolean touchAbove = Boolean.FALSE;
     @Getter
+    @Setter
     private Double kP = 0.0;
     @Getter
+    @Setter
     private Double dP = 0.0;
     @Getter
+    @Setter
     private Double dnP = 0.0;
     private String identifier = "";
     @Setter
@@ -52,9 +55,9 @@ public class IndicatorStochastic implements ITechnicalIndicator{
             dP = getCurrentMA(d,kP,previousDP);
             dnP = getCurrentMA(dn,dP,previousDNP);
             log.info("{}|{}|KP : {}, DP : {}, DNP : {}",this.instrument.getName(),this.identifier,this.kP,this.dP,this.dnP);
-            if(kP < 35)
+            if(kP < 30)
                 touchedBelow = Boolean.TRUE;
-            else if(kP > 65)
+            else if(kP > 70)
                 touchAbove = Boolean.TRUE;
             if(count > 0 && count % 3 == 0)
                 resetLevels();
@@ -81,6 +84,12 @@ public class IndicatorStochastic implements ITechnicalIndicator{
         touchAbove = Boolean.FALSE;
         touchedBelow = Boolean.FALSE;
         count = 0;
+    }
+
+    public void copyValues(IndicatorStochastic source){
+        this.setDnP(source.getDnP());
+        this.setDP(source.getDP());
+        this.setKP(source.getKP());
     }
 
     private double getCurrentMA(double period,double currentValue,double previousMA){

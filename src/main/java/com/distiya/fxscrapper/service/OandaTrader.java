@@ -165,6 +165,7 @@ public class OandaTrader implements ITrader{
                     tradeInstrument.setCurrentLowMarket(cl.get(cl.size()-1).getMid());
                     tradeInstrument.setLowTimeMarketHistory(cl);
                     tradeInstrument.getCurrentEmaLowIndicator().update(tradeInstrument.getCurrentLowMarket());
+                    tradeInstrument.getExCurrentStochasticLowIndicator().copyValues(tradeInstrument.getCurrentStochasticLowIndicator());
                     tradeInstrument.getCurrentStochasticLowIndicator().update(tradeInstrument.getCurrentLowMarket());
                     tradeInstrument.setLastLowCandleUpdatedTime(lastCandleTime);
                 }
@@ -176,6 +177,7 @@ public class OandaTrader implements ITrader{
                     tradeInstrument.setCurrentHighMarket(cl.get(cl.size()-1).getMid());
                     tradeInstrument.setHighTimeMarketHistory(cl);
                     tradeInstrument.getCurrentEmaHighIndicator().update(tradeInstrument.getCurrentHighMarket());
+                    tradeInstrument.getExCurrentStochasticHighIndicator().copyValues(tradeInstrument.getCurrentStochasticHighIndicator());
                     tradeInstrument.getCurrentStochasticHighIndicator().update(tradeInstrument.getCurrentHighMarket());
                     tradeInstrument.setLastHighCandleUpdatedTime(lastCandleTime);
                 }

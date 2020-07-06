@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class SupportedResolutionProperties {
     private String symbol = "";
+    private Integer seconds = 0;
     private Integer minutes = 0;
     private Integer hours = 0;
     private Integer days = 0;

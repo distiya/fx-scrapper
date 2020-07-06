@@ -12,4 +12,6 @@ import lombok.Setter;
 public class SupportedTickerProperties {
     private String ticker = "";
     private Boolean enabled = false;
+    private Boolean isIndex = false;
+    private String baseCurrency = "USD";
 }

@@ -23,6 +23,10 @@ public class AppUtil {
 
     public static CandlestickGranularity getCandlestickGranularity(String res){
         switch (res){
+            case "S5":return CandlestickGranularity.S5;
+            case "S10":return CandlestickGranularity.S10;
+            case "S15":return CandlestickGranularity.S15;
+            case "S30":return CandlestickGranularity.S30;
             case "M1":return CandlestickGranularity.M1;
             case "M2":return CandlestickGranularity.M2;
             case "M10":return CandlestickGranularity.M10;
@@ -59,9 +63,17 @@ public class AppUtil {
     }
 
     public static double getUnitCount(String instrument, PortfolioStatus portfolioStatus){
-        String[] baseHomePair = getBaseHomePair(instrument, portfolioStatus.getHomeCurrency().toString());
         double baseHomeRate = 1.0;
         double units = 0;
+        String[] baseHomePair;
+        if(portfolioStatus.getIndexTickers().containsKey(instrument)){
+            baseHomePair = new String[2];
+            baseHomePair[0] = portfolioStatus.getIndexTickers().get(instrument).stream().findFirst().map(si->si.getBaseCurrency()).orElse("USD") + "_" + portfolioStatus.getHomeCurrency().toString();
+            baseHomePair[1] = portfolioStatus.getHomeCurrency().toString() + "_" + portfolioStatus.getIndexTickers().get(instrument).stream().findFirst().map(si->si.getBaseCurrency()).orElse("USD");
+        }
+        else{
+            baseHomePair = getBaseHomePair(instrument, portfolioStatus.getHomeCurrency().toString());
+        }
         if(portfolioStatus.getHomeInstrumentMap().containsKey(baseHomePair[0])){
             baseHomeRate = portfolioStatus.getHomeInstrumentMap().get(baseHomePair[0]).getCurrentLowMarket().getC().doubleValue();
         }
@@ -70,7 +82,7 @@ public class AppUtil {
         }
         if(portfolioStatus.getTradeInstrumentMap().containsKey(instrument)){
             TradeInstrument tradeInstrument = portfolioStatus.getTradeInstrumentMap().get(instrument);
-            units = portfolioStatus.getMargin() * tradeInstrument.getCurrentFraction()/baseHomeRate;
+            units = (portfolioStatus.getMargin()/portfolioStatus.getAppConfigProperties().getBroker().getMarginRatio()) * tradeInstrument.getCurrentFraction()/baseHomeRate;
             tradeInstrument.setMaxUnits(units);
         }
         return units;

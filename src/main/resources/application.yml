@@ -28,6 +28,7 @@ app:
       homeCurrency: SGD
       leftMargin: 99845.0
       minCandleDiff: 0.001
+      marginRatio: 0.05
       minTradeProfitPercentage: 5.0
       orderPlacing: 10 0/2 * ? * MON-SAT
       dailyPreparation: 0 10 0 ? * MON-SAT
@@ -268,6 +269,8 @@ app:
           enabled: false
         - ticker: SPX500_USD
           enabled: false
+          isIndex: true
+          baseCurrency: USD
         - ticker: UK10YB_GBP
           enabled: false
         - ticker: US2000_USD
@@ -287,6 +290,18 @@ app:
         - ticker: NAS100_USD
           enabled: false
       supportedResolutions:
+        - symbol: S5
+          seconds: 5
+          enabled: false
+        - symbol: S10
+          seconds: 10
+          enabled: false
+        - symbol: S15
+          seconds: 15
+          enabled: false
+        - symbol: S30
+          seconds: 30
+          enabled: false
         - symbol: M1
           minutes: 1
           enabled: false

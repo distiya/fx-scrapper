@@ -1,6 +1,7 @@
 package com.distiya.fxscrapper.domain;
 
 import com.distiya.fxscrapper.properties.AppConfigProperties;
+import com.distiya.fxscrapper.properties.SupportedTickerProperties;
 import com.distiya.fxscrapper.service.IPredictService;
 import com.oanda.v20.account.Account;
 import com.oanda.v20.account.AccountID;
@@ -45,11 +46,13 @@ public class PortfolioStatus {
     private CandlestickGranularity highTradingGranularity;
     private List<Instrument> tradableInstruments;
     private Set<InstrumentName> allPairs = new HashSet<>();
+    private Map<String, List<SupportedTickerProperties>> indexTickers;
 
     @PostConstruct
     public void initializePortfolioWarmingUp(){
         //initializeWarmUpForGranularity(this.getLowTradingGranularity());
         //initializeWarmUpForGranularity(this.getHighTradingGranularity());
+        indexTickers = appConfigProperties.getBroker().getSupportedTickers().stream().filter(st -> st.getIsIndex()).collect(Collectors.groupingBy(st -> st.getTicker()));
         this.setIsWarmingUp(false);
         log.info("PortfolioStatus constructed");
     }

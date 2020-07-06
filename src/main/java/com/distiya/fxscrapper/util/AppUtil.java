@@ -83,6 +83,9 @@ public class AppUtil {
         if(portfolioStatus.getTradeInstrumentMap().containsKey(instrument)){
             TradeInstrument tradeInstrument = portfolioStatus.getTradeInstrumentMap().get(instrument);
             units = (portfolioStatus.getMargin()/portfolioStatus.getAppConfigProperties().getBroker().getMarginRatio()) * tradeInstrument.getCurrentFraction()/baseHomeRate;
+            if(portfolioStatus.getIndexTickers().containsKey(instrument)){
+                units = units/tradeInstrument.getCurrentLowMarket().getC().doubleValue();
+            }
             tradeInstrument.setMaxUnits(units);
         }
         return units;

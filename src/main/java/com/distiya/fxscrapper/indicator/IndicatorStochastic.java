@@ -55,9 +55,9 @@ public class IndicatorStochastic implements ITechnicalIndicator{
             dP = getCurrentMA(d,kP,previousDP);
             dnP = getCurrentMA(dn,dP,previousDNP);
             log.info("{}|{}|KP : {}, DP : {}, DNP : {}",this.instrument.getName(),this.identifier,this.kP,this.dP,this.dnP);
-            if(kP < 30)
+            if(kP < 21)
                 touchedBelow = Boolean.TRUE;
-            else if(kP > 70)
+            else if(kP > 79)
                 touchAbove = Boolean.TRUE;
             if(count > 0 && count % 3 == 0)
                 resetLevels();

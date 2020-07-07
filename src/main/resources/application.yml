@@ -22,7 +22,7 @@ app:
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
-      lowTimeFrame: S10
+      lowTimeFrame: S5
       highTimeFrame: M1
       defaultPredictBatchLength: 48
       homeCurrency: SGD
@@ -32,7 +32,7 @@ app:
       minTradeProfitPercentage: 0.5
       extremeTradeProfitPercentage: 2.5
       cutoffTradeProfitPercentage: 1.0
-      orderPlacing: 0/10 * * ? * MON-SAT
+      orderPlacing: 0/5 * * ? * MON-SAT
       dailyPreparation: 0 10 0 ? * MON-SAT
       highScreenScheduling: 0 0/1 * ? * MON-SAT
       timeZone: Asia/Singapore
@@ -294,10 +294,10 @@ app:
       supportedResolutions:
         - symbol: S5
           seconds: 5
-          enabled: false
+          enabled: true
         - symbol: S10
           seconds: 10
-          enabled: true
+          enabled: false
         - symbol: S15
           seconds: 15
           enabled: false

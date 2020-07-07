@@ -23,7 +23,7 @@ app:
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
       lowTimeFrame: S10
-      highTimeFrame: M2
+      highTimeFrame: M1
       defaultPredictBatchLength: 48
       homeCurrency: SGD
       leftMargin: 98000.0
@@ -34,7 +34,7 @@ app:
       cutoffTradeProfitPercentage: 1.0
       orderPlacing: 0/10 * * ? * MON-SAT
       dailyPreparation: 0 10 0 ? * MON-SAT
-      highScreenScheduling: 0 0/2 * ? * MON-SAT
+      highScreenScheduling: 0 0/1 * ? * MON-SAT
       timeZone: Asia/Singapore
       supportedTickers:
         - ticker: GBP_USD
@@ -306,10 +306,10 @@ app:
           enabled: false
         - symbol: M1
           minutes: 1
-          enabled: false
+          enabled: true
         - symbol: M2
           minutes: 2
-          enabled: true
+          enabled: false
         - symbol: M5
           minutes: 5
           enabled: false

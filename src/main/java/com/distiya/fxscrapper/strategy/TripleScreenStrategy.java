@@ -121,9 +121,9 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private int tradeOpeningStatus(TradeInstrument ti){
-        if(getUpperScreenTrend(ti) > 1 && tradeEnterStatus(ti) > 1 && ti.getCurrentStochasticLowIndicator().getTouchedBelow())
+        if(getUpperScreenTrend(ti) > 0 && tradeEnterStatus(ti) > 0 && ti.getCurrentStochasticLowIndicator().getTouchedBelow())
             return 1;
-        else if(getUpperScreenTrend(ti) < 1 && tradeEnterStatus(ti) < 1 && ti.getCurrentStochasticLowIndicator().getTouchAbove())
+        else if(getUpperScreenTrend(ti) < 0 && tradeEnterStatus(ti) < 0 && ti.getCurrentStochasticLowIndicator().getTouchAbove())
             return -1;
         else
             return 0;

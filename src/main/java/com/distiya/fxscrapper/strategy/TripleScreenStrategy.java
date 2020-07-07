@@ -72,13 +72,25 @@ public class TripleScreenStrategy implements ITradeStrategy{
                         if(tradeCurrentProfitPercentage >= appConfigProperties.getBroker().getExtremeTradeProfitPercentage()){
                             ti.setHasExtremeEnd(true);
                         }
-                        if((ti.getHasExtremeEnd() && tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && tradeCurrentProfitPercentage < appConfigProperties.getBroker().getCutoffTradeProfitPercentage()) || (tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0)))){
+                        if(isTrendReversalWithLoss(ti,tr) || isExtremeEndReversal(ti,tradeCurrentProfitPercentage) || isIndicatorReversalWithProfit(ti,tradeCurrentProfitPercentage,tr)){
                             tradeService.closeTradeForCurrentAccount(tr.getId());
                             updateLastTradeCloseSignal(ti);
                             ti.setHasExtremeEnd(false);
                         }
                     });
         });
+    }
+
+    private boolean isExtremeEndReversal(TradeInstrument ti,double tradeCurrentProfitPercentage){
+        return ti.getHasExtremeEnd() && tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && tradeCurrentProfitPercentage < appConfigProperties.getBroker().getCutoffTradeProfitPercentage();
+    }
+
+    private boolean isIndicatorReversalWithProfit(TradeInstrument ti,double tradeCurrentProfitPercentage,Trade tr){
+        return tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0));
+    }
+
+    private boolean isTrendReversalWithLoss(TradeInstrument ti,Trade tr){
+        return (getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() > 0);
     }
 
     private int getUpperScreenTrend(TradeInstrument ti){

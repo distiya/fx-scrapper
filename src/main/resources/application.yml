@@ -30,8 +30,8 @@ app:
       minCandleDiff: 0.001
       marginRatio: 0.05
       minTradeProfitPercentage: 0.5
-      extremeTradeProfitPercentage: 3.0
-      cutoffTradeProfitPercentage: 1.5
+      extremeTradeProfitPercentage: 2.5
+      cutoffTradeProfitPercentage: 1.0
       orderPlacing: 0/5 * * ? * MON-SAT
       dailyPreparation: 0 10 0 ? * MON-SAT
       highScreenScheduling: 0 0/1 * ? * MON-SAT

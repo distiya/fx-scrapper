@@ -40,6 +40,7 @@ public class TradeInstrument {
     private Long openedTradeCount = 0l;
     private Integer tradeDirection = 0;
     private Integer lastTradeCloseSignal = 0;
+    private Boolean hasExtremeEnd = false;
     private IndicatorEMA emaLowIndicator = new IndicatorEMA(12,5,"PredictedLowScreenEMA",instrument);
     private IndicatorStochastic stochasticLowIndicator = new IndicatorStochastic(10,6,6,"PredictedLowScreenStochastic",instrument);
     private IndicatorEMA emaHighIndicator = new IndicatorEMA(12,5,"PredictedHighScreenEMA",instrument);

@@ -41,6 +41,8 @@ public class BrokerConfigProperties {
     private Double minCandleDiff = 0.002;
     private Double marginRatio = 0.05;
     private Double minTradeProfitPercentage = 0.1;
+    private Double extremeTradeProfitPercentage = 0.1;
+    private Double cutoffTradeProfitPercentage = 0.1;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate startDate = LocalDate.now();
     private List<SupportedTickerProperties> supportedTickers = new ArrayList<>();

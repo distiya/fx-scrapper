@@ -69,9 +69,13 @@ public class TripleScreenStrategy implements ITradeStrategy{
                         double tradeCurrentProfitPercentage = (tr.getUnrealizedPL().doubleValue() / tr.getInitialMarginRequired().doubleValue()) * 100.0;
                         log.info("OpenTrade|{}|Unrealized Profit&Loss : {}|Current Profit Percentage : {}|Expected Profit Percentage : {}",tr.getInstrument(),tr.getUnrealizedPL().doubleValue(),tradeCurrentProfitPercentage,appConfigProperties.getBroker().getMinTradeProfitPercentage());
                         TradeInstrument ti = portfolioStatus.getTradeInstrumentMap().get(tr.getInstrument());
-                        if(tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0))){
+                        if(tradeCurrentProfitPercentage >= appConfigProperties.getBroker().getExtremeTradeProfitPercentage()){
+                            ti.setHasExtremeEnd(true);
+                        }
+                        if((ti.getHasExtremeEnd() && tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && tradeCurrentProfitPercentage < appConfigProperties.getBroker().getCutoffTradeProfitPercentage()) || (tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0)))){
                             tradeService.closeTradeForCurrentAccount(tr.getId());
                             updateLastTradeCloseSignal(ti);
+                            ti.setHasExtremeEnd(false);
                         }
                     });
         });

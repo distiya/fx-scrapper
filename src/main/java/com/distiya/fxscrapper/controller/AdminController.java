@@ -24,6 +24,12 @@ public class AdminController {
             appConfigProperties.getBroker().setSkipFutureTrades(adminConfig.getSkipFutureTrades());
         if(adminConfig.getLeftMarginAmount() != null && adminConfig.getLeftMarginAmount() > 0)
             appConfigProperties.getBroker().setLeftMargin(adminConfig.getLeftMarginAmount());
+        if(adminConfig.getExtremeProfitPercentage() != null && adminConfig.getExtremeProfitPercentage() > 0)
+            appConfigProperties.getBroker().setExtremeTradeProfitPercentage(adminConfig.getExtremeProfitPercentage());
+        if(adminConfig.getCutoffProfitPercentage() != null && adminConfig.getCutoffProfitPercentage() > 0)
+            appConfigProperties.getBroker().setCutoffTradeProfitPercentage(adminConfig.getCutoffProfitPercentage());
+        if(adminConfig.getInvestingFactor() != null && adminConfig.getInvestingFactor() > 0)
+            appConfigProperties.getBroker().setInvestingFactor(adminConfig.getInvestingFactor());
         log.info("Setting admin config completed");
         return convertToAdminConfig(appConfigProperties);
     }
@@ -39,6 +45,9 @@ public class AdminController {
         config.setLeftMarginAmount(appConfigProperties.getBroker().getLeftMargin());
         config.setSkipFutureTrades(appConfigProperties.getBroker().getSkipFutureTrades());
         config.setTakeProfitPercentage(appConfigProperties.getBroker().getMinTradeProfitPercentage());
+        config.setExtremeProfitPercentage(appConfigProperties.getBroker().getExtremeTradeProfitPercentage());
+        config.setCutoffProfitPercentage(appConfigProperties.getBroker().getCutoffTradeProfitPercentage());
+        config.setInvestingFactor(appConfigProperties.getBroker().getInvestingFactor());
         return config;
     }
 }

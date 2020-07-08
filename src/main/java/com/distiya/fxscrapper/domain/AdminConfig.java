@@ -11,6 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AdminConfig {
     private Double takeProfitPercentage;
+    private Double extremeProfitPercentage;
+    private Double cutoffProfitPercentage;
+    private Double investingFactor;
     private Boolean skipFutureTrades;
     private Double leftMarginAmount;
 }

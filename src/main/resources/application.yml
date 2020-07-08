@@ -5,11 +5,17 @@ spring:
     active: test
 server:
   port: 8080
+  tomcat:
+    max-threads: 4
 management:
   endpoints:
+    jmx:
+      exposure:
+        include: health,info
     web:
       exposure:
         include: "*"
+        exclude: env,beans
 app:
   config:
     predictService:
@@ -38,9 +44,9 @@ app:
       extremeTradeProfitPercentage: 4.0
       cutoffTradeProfitPercentage: 2.5
       investingFactor: 0.75
-      orderPlacing: 0/5 * * ? * MON-SAT
-      dailyPreparation: 0 10 0 ? * MON-SAT
-      highScreenScheduling: 0/30 * * ? * MON-SAT
+      orderPlacing: 0/5 * * ? * *
+      dailyPreparation: 0 10 0 ? * *
+      highScreenScheduling: 0/30 * * ? * *
       timeZone: Asia/Singapore
       supportedTickers:
         - ticker: GBP_USD
@@ -367,6 +373,7 @@ app:
     broker:
       mode: DEMO
       apiUrl: https://api-fxpractice.oanda.com
+      apiStreamUrl: https://stream-fxpractice.oanda.com
 ---
 spring:
   profiles: prod

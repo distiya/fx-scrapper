@@ -1,0 +1,15 @@
+---
+timeout: 180
+applications:
+  - name: oanda-trade-bot-qa
+    memory: 256M
+    instances: 1
+    path: ../target/fx-scrapper-0.0.1-SNAPSHOT.jar
+    routes:
+      - route: oanda-trade-bot-qa.cfapps.io
+    env:
+      SPRING_PROFILES_ACTIVE: dev
+      OANDA_API_ACCOUNT: 101-003-14285287-001
+      OANDA_API_TOKEN: fd2f8fd9a614f37400e916e79e10cd25-3fc748895294f796839860f7af270dc1
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 14.+}}'
+      JAVA_OPTS: '-XX:MaxMetaspaceSize=80780K -Xss320k -Xmx256M -XX:ReservedCodeCacheSize=16M -XX:MaxDirectMemorySize=16M -Duser.timezone=Asia/Singapore'

@@ -104,7 +104,7 @@ public class OandaTrader implements ITrader{
                 log.info("{}|Starting trading",getCurrentTime());
                 accountService.getCurrentAccount().ifPresent(a->portfolioStatus.setAccount(a));
                 log.info("Allocated left margin : {}",appConfigProperties.getBroker().getLeftMargin());
-                portfolioStatus.setMargin((portfolioStatus.getAccount().getMarginAvailable().doubleValue()-appConfigProperties.getBroker().getLeftMargin())/2.0);
+                portfolioStatus.setMargin((portfolioStatus.getAccount().getMarginAvailable().doubleValue()-appConfigProperties.getBroker().getLeftMargin())*appConfigProperties.getBroker().getInvestingFactor());
                 updateAllMarketCandles(appConfigProperties.getBroker().getDefaultPredictBatchLength());
                 //updateAllMaxUnitCount();
                 //predictService.getPredictionsForPortfolio(portfolioStatus.getLowTradingGranularity(),portfolioStatus);

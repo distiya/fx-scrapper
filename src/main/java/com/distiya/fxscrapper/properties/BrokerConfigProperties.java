@@ -43,6 +43,7 @@ public class BrokerConfigProperties {
     private Double minTradeProfitPercentage = 0.1;
     private Double extremeTradeProfitPercentage = 0.1;
     private Double cutoffTradeProfitPercentage = 0.1;
+    private Double investingFactor = 0.75;
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate startDate = LocalDate.now();
     private List<SupportedTickerProperties> supportedTickers = new ArrayList<>();

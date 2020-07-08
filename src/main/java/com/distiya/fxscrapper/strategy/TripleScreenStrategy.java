@@ -90,13 +90,22 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private boolean isTrendReversalWithLoss(TradeInstrument ti,Trade tr){
-        return (getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() > 0);
+        return (getUpperScreenTrendWhenReversal(ti) > 0 && tr.getCurrentUnits().doubleValue() < 0) || (getUpperScreenTrendWhenReversal(ti) < 0 && tr.getCurrentUnits().doubleValue() > 0);
     }
 
     private int getUpperScreenTrend(TradeInstrument ti){
         if(ti.getCurrentEmaHighIndicator().getSlowEMA() > ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() < ti.getCurrentStochasticHighIndicator().getDnP())
             return -1;
         else if(ti.getCurrentEmaHighIndicator().getSlowEMA() < ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() > ti.getCurrentStochasticHighIndicator().getDnP())
+            return 1;
+        else
+            return 0;
+    }
+
+    private int getUpperScreenTrendWhenReversal(TradeInstrument ti){
+        if(ti.getCurrentEmaHighIndicator().getSlowEMA() > ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() < ti.getCurrentStochasticHighIndicator().getDnP() && ti.getCurrentStochasticHighIndicator().getKP() < ti.getCurrentStochasticHighIndicator().getDP())
+            return -1;
+        else if(ti.getCurrentEmaHighIndicator().getSlowEMA() < ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() > ti.getCurrentStochasticHighIndicator().getDnP() && ti.getCurrentStochasticHighIndicator().getKP() > ti.getCurrentStochasticHighIndicator().getDP())
             return 1;
         else
             return 0;

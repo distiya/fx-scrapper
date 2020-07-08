@@ -5,6 +5,11 @@ spring:
     active: test
 server:
   port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 app:
   config:
     predictService:
@@ -23,18 +28,19 @@ app:
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
       lowTimeFrame: S5
-      highTimeFrame: M1
+      highTimeFrame: S30
       defaultPredictBatchLength: 48
       homeCurrency: SGD
       leftMargin: 98000.0
       minCandleDiff: 0.001
       marginRatio: 0.05
       minTradeProfitPercentage: 0.5
-      extremeTradeProfitPercentage: 2.5
-      cutoffTradeProfitPercentage: 1.0
+      extremeTradeProfitPercentage: 4.0
+      cutoffTradeProfitPercentage: 2.5
+      investingFactor: 0.75
       orderPlacing: 0/5 * * ? * MON-SAT
       dailyPreparation: 0 10 0 ? * MON-SAT
-      highScreenScheduling: 0 0/1 * ? * MON-SAT
+      highScreenScheduling: 0/30 * * ? * MON-SAT
       timeZone: Asia/Singapore
       supportedTickers:
         - ticker: GBP_USD
@@ -303,10 +309,10 @@ app:
           enabled: false
         - symbol: S30
           seconds: 30
-          enabled: false
+          enabled: true
         - symbol: M1
           minutes: 1
-          enabled: true
+          enabled: false
         - symbol: M2
           minutes: 2
           enabled: false

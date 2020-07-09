@@ -86,6 +86,7 @@ public class PortfolioStatus {
                 Candlestick currentMarket = ti.getLowTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
                 ti.getCurrentEmaLowIndicator().update(currentMarket.getMid());
                 ti.getCurrentStochasticLowIndicator().update(currentMarket.getMid());
+                ti.getCurrentAdxLowIndicator().update(currentMarket.getMid());
                 //ti.getCurrentEmaHighIndicator().getSlowEMA(),ti.getCurrentEmaHighIndicator().getFastEMA(),ti.getCurrentStochasticHighIndicator().getKP(),ti.getCurrentStochasticHighIndicator().getDP(),ti.getCurrentStochasticHighIndicator().getDnP()
                 log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentLowPredicted().getO(),ti.getCurrentLowPredicted().getC(),ti.getCurrentLowPredicted().getH(),ti.getCurrentLowPredicted().getL(),ti.getEmaLowIndicator().getSlowEMA(),ti.getEmaLowIndicator().getFastEMA(),ti.getStochasticLowIndicator().getKP(),ti.getStochasticLowIndicator().getDP(),ti.getStochasticLowIndicator().getDnP(),ti.getCurrentEmaLowIndicator().getSlowEMA(),ti.getCurrentEmaLowIndicator().getFastEMA(),ti.getCurrentStochasticLowIndicator().getKP(),ti.getCurrentStochasticLowIndicator().getDP(),ti.getCurrentStochasticLowIndicator().getDnP());
             }
@@ -93,6 +94,7 @@ public class PortfolioStatus {
                 Candlestick currentMarket = ti.getHighTimeMarketHistory().get(appConfigProperties.getBroker().getDefaultPredictBatchLength().intValue() - 1);
                 ti.getCurrentEmaHighIndicator().update(currentMarket.getMid());
                 ti.getCurrentStochasticHighIndicator().update(currentMarket.getMid());
+                ti.getCurrentAdxHighIndicator().update(currentMarket.getMid());
                 log.info("SIGNAL-INDICATE,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",granularity,ti.getInstrument().getName(),currentMarket.getTime(),currentMarket.getMid().getO(),currentMarket.getMid().getC(),currentMarket.getMid().getH(),currentMarket.getMid().getL(),ti.getCurrentHighPredicted().getO(),ti.getCurrentHighPredicted().getC(),ti.getCurrentHighPredicted().getH(),ti.getCurrentHighPredicted().getL(),ti.getEmaHighIndicator().getSlowEMA(),ti.getEmaHighIndicator().getFastEMA(),ti.getStochasticHighIndicator().getKP(),ti.getStochasticHighIndicator().getDP(),ti.getStochasticHighIndicator().getDnP(),ti.getCurrentEmaHighIndicator().getSlowEMA(),ti.getCurrentEmaHighIndicator().getFastEMA(),ti.getCurrentStochasticHighIndicator().getKP(),ti.getCurrentStochasticHighIndicator().getDP(),ti.getCurrentStochasticHighIndicator().getDnP());
             }
         });

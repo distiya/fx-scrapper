@@ -1,5 +1,6 @@
 package com.distiya.fxscrapper.domain;
 
+import com.distiya.fxscrapper.indicator.IndicatorADX;
 import com.distiya.fxscrapper.indicator.IndicatorEMA;
 import com.distiya.fxscrapper.indicator.IndicatorStochastic;
 import com.oanda.v20.instrument.Candlestick;
@@ -51,6 +52,8 @@ public class TradeInstrument {
     private IndicatorEMA currentEmaHighIndicator = new IndicatorEMA(12,5,"CurrentHighScreenEMA",instrument);
     private IndicatorStochastic currentStochasticHighIndicator = new IndicatorStochastic(10,6,6,"CurrentHighScreenStochastic",instrument);
     private IndicatorStochastic exCurrentStochasticHighIndicator = new IndicatorStochastic(10,6,6,"CurrentHighScreenStochastic",instrument);
+    private IndicatorADX currentAdxLowIndicator = new IndicatorADX(14,instrument,"CurrentLowADX");
+    private IndicatorADX currentAdxHighIndicator = new IndicatorADX(14,instrument,"CurrentHighADX");
 
     public void updateIndicators(){
         emaLowIndicator.setInstrument(instrument);
@@ -61,6 +64,8 @@ public class TradeInstrument {
         currentStochasticLowIndicator.setInstrument(instrument);
         currentEmaHighIndicator.setInstrument(instrument);
         currentStochasticHighIndicator.setInstrument(instrument);
+        currentAdxHighIndicator.setInstrument(instrument);
+        currentAdxLowIndicator.setInstrument(instrument);
     }
 
     public void incrementOpenedTradeCount(){

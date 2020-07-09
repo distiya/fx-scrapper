@@ -1,6 +1,7 @@
 package com.distiya.fxscrapper.config;
 
 import com.distiya.fxscrapper.domain.PortfolioStatus;
+import com.distiya.fxscrapper.indicator.IndicatorADX;
 import com.distiya.fxscrapper.indicator.IndicatorEMA;
 import com.distiya.fxscrapper.indicator.IndicatorStochastic;
 import com.distiya.fxscrapper.predict.FxPredictGrpc;
@@ -96,8 +97,8 @@ public class FxScrapperConfig {
                             historyService.requestHistory(ti.getInstrument().getName(),portfolioStatus.getHighTradingGranularity(),5000l)
                                     .map(cl->cl.stream().collect(Collectors.toList()))
                                     .ifPresent(cdl->ti.setHighTimeMarketHistory(cdl));
-                            updateCurrentIndicators(ti.getLowTimeMarketHistory(),ti.getCurrentStochasticLowIndicator(),ti.getCurrentEmaLowIndicator());
-                            updateCurrentIndicators(ti.getHighTimeMarketHistory(),ti.getCurrentStochasticHighIndicator(),ti.getCurrentEmaHighIndicator());
+                            updateCurrentIndicators(ti.getLowTimeMarketHistory(),ti.getCurrentStochasticLowIndicator(),ti.getCurrentEmaLowIndicator(),ti.getCurrentAdxLowIndicator());
+                            updateCurrentIndicators(ti.getHighTimeMarketHistory(),ti.getCurrentStochasticHighIndicator(),ti.getCurrentEmaHighIndicator(),ti.getCurrentAdxHighIndicator());
                             ti.setLastLowCandleUpdatedTime(ti.getLowTimeMarketHistory().get(ti.getLowTimeMarketHistory().size()-1).getTime());
                             ti.setLastHighCandleUpdatedTime(ti.getHighTimeMarketHistory().get(ti.getHighTimeMarketHistory().size()-1).getTime());
                             ti.setPreviousHighMarket(ti.getHighTimeMarketHistory().get(ti.getHighTimeMarketHistory().size()-2).getMid());
@@ -121,10 +122,11 @@ public class FxScrapperConfig {
         return portfolioStatus;
     }
 
-    private void updateCurrentIndicators(List<Candlestick> cl, IndicatorStochastic stochastic, IndicatorEMA ema){
+    private void updateCurrentIndicators(List<Candlestick> cl, IndicatorStochastic stochastic, IndicatorEMA ema, IndicatorADX adx){
         cl.stream().forEach(cs->{
             stochastic.update(cs.getMid());
             ema.update(cs.getMid());
+            adx.update(cs.getMid());
             stochastic.resetLevels();
         });
     }

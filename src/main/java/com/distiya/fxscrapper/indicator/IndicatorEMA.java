@@ -16,6 +16,8 @@ public class IndicatorEMA implements ITechnicalIndicator{
     private Double fastFactor = 2.0/(fastPeriod+1.0);
     private Double previousSlowEMA = 0.0;
     private Double previousFastEMA = 0.0;
+    private int psec = 0;
+    private int pfec = 0;
     @Getter
     private Integer currentSignal = 0;
     private String identifier = "";
@@ -31,8 +33,21 @@ public class IndicatorEMA implements ITechnicalIndicator{
     @Override
     public void update(PredictedCandle currentPrice) {
         Double previousEMADiff = this.previousSlowEMA - this.previousFastEMA;
-        this.previousSlowEMA = currentPrice.getPredicted().getClose() * this.slowFactor + this.previousSlowEMA * (1-this.slowFactor);
-        this.previousFastEMA = currentPrice.getPredicted().getClose() * this.fastFactor + this.previousFastEMA * (1-this.fastFactor);
+        if(this.psec<this.slowPeriod){
+            this.previousSlowEMA += currentPrice.getPredicted().getClose()/this.slowPeriod;
+            this.psec++;
+        }
+        else{
+            this.previousSlowEMA = currentPrice.getPredicted().getClose() * this.slowFactor + this.previousSlowEMA * (1-this.slowFactor);
+        }
+
+        if(this.pfec<this.fastPeriod){
+            this.previousFastEMA += currentPrice.getPredicted().getClose()/this.fastPeriod;
+            this.pfec++;
+        }
+        else{
+            this.previousFastEMA = currentPrice.getPredicted().getClose() * this.fastFactor + this.previousFastEMA * (1-this.fastFactor);
+        }
         log.info("{}|{}|Slow : {}, Fast : {}",this.instrument.getName(),this.identifier,this.previousSlowEMA,this.previousFastEMA);
         Double currentEMADiff = this.previousSlowEMA - this.previousFastEMA;
         if(previousEMADiff < 0 && currentEMADiff > 0)

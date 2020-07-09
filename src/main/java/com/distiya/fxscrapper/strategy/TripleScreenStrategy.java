@@ -82,7 +82,7 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private boolean isExtremeEndReversal(TradeInstrument ti,double tradeCurrentProfitPercentage){
-        return ti.getHasExtremeEnd() && tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && tradeCurrentProfitPercentage < appConfigProperties.getBroker().getCutoffTradeProfitPercentage();
+        return ti.getHasExtremeEnd() && tradeCurrentProfitPercentage > 0 && tradeCurrentProfitPercentage < appConfigProperties.getBroker().getCutoffTradeProfitPercentage();
     }
 
     private boolean isIndicatorReversalWithProfit(TradeInstrument ti,double tradeCurrentProfitPercentage,Trade tr){
@@ -94,18 +94,18 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private int getUpperScreenTrend(TradeInstrument ti){
-        if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentEmaHighIndicator().getSlowEMA() > ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() < ti.getCurrentStochasticHighIndicator().getDnP())
+        if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentAdxHighIndicator().getMinusDI() > ti.getCurrentAdxHighIndicator().getPlusDI() && ti.getCurrentEmaHighIndicator().getSlowEMA() > ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() < ti.getCurrentStochasticHighIndicator().getDnP())
             return -1;
-        else if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentEmaHighIndicator().getSlowEMA() < ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() > ti.getCurrentStochasticHighIndicator().getDnP())
+        else if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentAdxHighIndicator().getPlusDI() > ti.getCurrentAdxHighIndicator().getMinusDI() && ti.getCurrentEmaHighIndicator().getSlowEMA() < ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() > ti.getCurrentStochasticHighIndicator().getDnP())
             return 1;
         else
             return 0;
     }
 
     private int getUpperScreenTrendWhenReversal(TradeInstrument ti){
-        if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentEmaHighIndicator().getSlowEMA() > ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() < ti.getCurrentStochasticHighIndicator().getDnP() && ti.getCurrentStochasticHighIndicator().getKP() < ti.getCurrentStochasticHighIndicator().getDP())
+        if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentAdxHighIndicator().getMinusDI() > ti.getCurrentAdxHighIndicator().getPlusDI() && ti.getCurrentEmaHighIndicator().getSlowEMA() > ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() < ti.getCurrentStochasticHighIndicator().getDnP() && ti.getCurrentStochasticHighIndicator().getKP() < ti.getCurrentStochasticHighIndicator().getDP())
             return -1;
-        else if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentEmaHighIndicator().getSlowEMA() < ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() > ti.getCurrentStochasticHighIndicator().getDnP() && ti.getCurrentStochasticHighIndicator().getKP() > ti.getCurrentStochasticHighIndicator().getDP())
+        else if(ti.getCurrentAdxHighIndicator().getADX() > 25 && ti.getCurrentAdxHighIndicator().getPlusDI() > ti.getCurrentAdxHighIndicator().getMinusDI() && ti.getCurrentEmaHighIndicator().getSlowEMA() < ti.getCurrentEmaHighIndicator().getFastEMA() && ti.getCurrentStochasticHighIndicator().getDP() > ti.getCurrentStochasticHighIndicator().getDnP() && ti.getCurrentStochasticHighIndicator().getKP() > ti.getCurrentStochasticHighIndicator().getDP())
             return 1;
         else
             return 0;

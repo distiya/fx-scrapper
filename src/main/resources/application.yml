@@ -41,8 +41,8 @@ app:
       minCandleDiff: 0.001
       marginRatio: 0.05
       minTradeProfitPercentage: 0.5
-      extremeTradeProfitPercentage: 4.0
-      cutoffTradeProfitPercentage: 2.5
+      extremeTradeProfitPercentage: 3.0
+      cutoffTradeProfitPercentage: 1.5
       investingFactor: 0.75
       orderPlacing: 0/5 * * ? * *
       dailyPreparation: 0 10 0 ? * *

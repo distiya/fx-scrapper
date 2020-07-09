@@ -30,6 +30,7 @@ public class BrokerConfigProperties {
     private Long defaultPredictBatchLength = 48l;
     private String homeCurrency = "SGD";
     private String orderPlacing = "0 0/5 * ? * *";
+    private String maxProfitChecking = "0 0/5 * ? * *";
     private String highScreenScheduling = "0 0/5 * ? * *";
     private String dailyPreparation = "0 0/5 * ? * *";
     private Boolean tradingMode = false;
@@ -41,6 +42,7 @@ public class BrokerConfigProperties {
     private Double minCandleDiff = 0.002;
     private Double marginRatio = 0.05;
     private Double minTradeProfitPercentage = 0.1;
+    private Double maxTradeProfitPercentage = 0.1;
     private Double extremeTradeProfitPercentage = 0.1;
     private Double cutoffTradeProfitPercentage = 0.1;
     private Double investingFactor = 0.75;

@@ -46,6 +46,27 @@ public class TripleScreenStrategy implements ITradeStrategy{
         openEligibleTrades();
     }
 
+    @Override
+    public void closeMaxProfitTrades(){
+        Optional<List<Trade>> currentOpenTrades = tradeService.getOpenTradesForCurrentAccount();
+        currentOpenTrades.ifPresent(otl->{
+            otl.stream()
+                    .forEach(tr->{
+                        double tradeCurrentProfitPercentage = (tr.getUnrealizedPL().doubleValue() / tr.getInitialMarginRequired().doubleValue()) * 100.0;
+                        TradeInstrument ti = portfolioStatus.getTradeInstrumentMap().get(tr.getInstrument());
+                        if(tradeCurrentProfitPercentage >= appConfigProperties.getBroker().getExtremeTradeProfitPercentage()){
+                            ti.setHasExtremeEnd(true);
+                        }
+                        if(isExtremeEndReversal(ti,tradeCurrentProfitPercentage) || tradeCurrentProfitPercentage >= appConfigProperties.getBroker().getMaxTradeProfitPercentage()){
+                            tradeService.closeTradeForCurrentAccount(tr.getId());
+                            updateLastTradeCloseSignal(ti);
+                            ti.setHasExtremeEnd(false);
+                            log.info("Trade {} closed because max profit limit has been reached for {}",tr.getId(),ti.getInstrument().getName());
+                        }
+                    });
+        });
+    }
+
     private void updateLastTradeCloseSignalForNonOpenedTradeInstruments(){
         portfolioStatus.getTradeInstrumentMap().values().stream()
                 .filter(ti->ti.getOpenedTradeCount() == 0)

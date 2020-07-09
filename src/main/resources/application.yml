@@ -33,20 +33,22 @@ app:
       apiAccount: ${OANDA_API_ACCOUNT}
       dataLocation: /home/sasitha/coding/fx/data/oanda/
       startDate: 2000-01-01
-      lowTimeFrame: S5
-      highTimeFrame: S30
+      lowTimeFrame: M2
+      highTimeFrame: M10
       defaultPredictBatchLength: 48
       homeCurrency: SGD
       leftMargin: 98000.0
       minCandleDiff: 0.001
       marginRatio: 0.05
       minTradeProfitPercentage: 0.5
+      maxTradeProfitPercentage: 6.0
       extremeTradeProfitPercentage: 3.0
-      cutoffTradeProfitPercentage: 1.5
+      cutoffTradeProfitPercentage: 2.0
       investingFactor: 0.75
-      orderPlacing: 0/5 * * ? * *
+      maxProfitChecking: 0/5 * * ? * *
+      orderPlacing: 0 0/2 * ? * *
       dailyPreparation: 0 10 0 ? * *
-      highScreenScheduling: 0/30 * * ? * *
+      highScreenScheduling: 0 0/10 * ? * *
       timeZone: Asia/Singapore
       supportedTickers:
         - ticker: GBP_USD
@@ -306,7 +308,7 @@ app:
       supportedResolutions:
         - symbol: S5
           seconds: 5
-          enabled: true
+          enabled: false
         - symbol: S10
           seconds: 10
           enabled: false
@@ -315,19 +317,19 @@ app:
           enabled: false
         - symbol: S30
           seconds: 30
-          enabled: true
+          enabled: false
         - symbol: M1
           minutes: 1
           enabled: false
         - symbol: M2
           minutes: 2
-          enabled: false
+          enabled: true
         - symbol: M5
           minutes: 5
           enabled: false
         - symbol: M10
           minutes: 10
-          enabled: false
+          enabled: true
         - symbol: M15
           minutes: 15
           enabled: false

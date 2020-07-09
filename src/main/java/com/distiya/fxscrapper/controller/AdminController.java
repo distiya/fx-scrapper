@@ -30,6 +30,8 @@ public class AdminController {
             appConfigProperties.getBroker().setCutoffTradeProfitPercentage(adminConfig.getCutoffProfitPercentage());
         if(adminConfig.getInvestingFactor() != null && adminConfig.getInvestingFactor() > 0)
             appConfigProperties.getBroker().setInvestingFactor(adminConfig.getInvestingFactor());
+        if(adminConfig.getMaxTakeProfitPercentage() != null && adminConfig.getMaxTakeProfitPercentage() > 0)
+            appConfigProperties.getBroker().setMaxTradeProfitPercentage(adminConfig.getMaxTakeProfitPercentage());
         log.info("Setting admin config completed");
         return convertToAdminConfig(appConfigProperties);
     }
@@ -48,6 +50,7 @@ public class AdminController {
         config.setExtremeProfitPercentage(appConfigProperties.getBroker().getExtremeTradeProfitPercentage());
         config.setCutoffProfitPercentage(appConfigProperties.getBroker().getCutoffTradeProfitPercentage());
         config.setInvestingFactor(appConfigProperties.getBroker().getInvestingFactor());
+        config.setMaxTakeProfitPercentage(appConfigProperties.getBroker().getMaxTradeProfitPercentage());
         return config;
     }
 }

@@ -114,7 +114,7 @@ public class OandaTrader implements ITrader{
                 log.info("{}|Ending trading",getCurrentTime());
             }
             catch (Exception e){
-                log.error("Error in trading : {}",e.getMessage());
+                log.error("Error in order placing : {}",e.getMessage());
             }
         }
     }
@@ -128,7 +128,21 @@ public class OandaTrader implements ITrader{
                 log.info("{}|Ending setting high screen candle history",getCurrentTime());
             }
             catch (Exception e){
-                log.error("Error in trading : {}",e.getMessage());
+                log.error("Error in high screen scheduling : {}",e.getMessage());
+            }
+        }
+    }
+
+    @Scheduled(cron = "${app.config.broker.maxProfitChecking}")
+    public void closeMaxProfitTrades(){
+        if(!this.portfolioStatus.getIsWarmingUp()){
+            try{
+                log.info("{}|Starting closing high open trades with max profit",getCurrentTime());
+                strategy.closeMaxProfitTrades();
+                log.info("{}|Ending closing high open trades with max profit",getCurrentTime());
+            }
+            catch (Exception e){
+                log.error("Error in max profit checking : {}",e.getMessage());
             }
         }
     }

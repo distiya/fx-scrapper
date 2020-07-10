@@ -201,14 +201,14 @@ public class TripleScreenStrategy implements ITradeStrategy{
 
     private void openAllEligibleTrades(List<TradeInstrument> tradableInstruments){
         tradableInstruments.stream().forEach(ti->{
-            if(tradeOpeningStatus(ti) > 0){
+            if(Math.floor(ti.getMaxUnits()) > 0 && tradeOpeningStatus(ti) > 0){
                 log.info("Opening a buy order with total fraction for {} is {}",ti.getInstrument().getName(),ti.getCurrentFraction());
                 OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * 1.0);
                 ti.getCurrentStochasticLowIndicator().resetLevels();
                 ti.setLastTradeCloseSignal(0);
                 ti.incrementOpenedTradeCount();
             }
-            else if(tradeOpeningStatus(ti) < 0){
+            else if(Math.floor(ti.getMaxUnits()) > 0 && tradeOpeningStatus(ti) < 0){
                 log.info("Opening a sell order with total fraction for {} is {}",ti.getInstrument().getName(),ti.getCurrentFraction());
                 OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * -1.0);
                 ti.getCurrentStochasticLowIndicator().resetLevels();

@@ -89,7 +89,7 @@ public class AppUtil {
                     units = units - 2.0;
                 }
             }
-            tradeInstrument.setMaxUnits(units);
+            tradeInstrument.setMaxUnits(units > 0 ? units : 0.0d);
         }
         return units;
     }

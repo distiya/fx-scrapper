@@ -142,9 +142,9 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private int tradeEnterStatus(TradeInstrument ti){
-        if(ti.getCurrentStochasticLowIndicator().getKP() < ti.getCurrentStochasticLowIndicator().getDP())
+        if(ti.getCurrentAdxLowIndicator().getADX() > 25 && ti.getCurrentAdxLowIndicator().getMinusDI() > ti.getCurrentAdxLowIndicator().getPlusDI() && ti.getCurrentStochasticLowIndicator().getKP() < ti.getCurrentStochasticLowIndicator().getDP())
             return -1;
-        if(ti.getCurrentStochasticLowIndicator().getKP() > ti.getCurrentStochasticLowIndicator().getDP())
+        if(ti.getCurrentAdxLowIndicator().getADX() > 25 && ti.getCurrentAdxLowIndicator().getPlusDI() > ti.getCurrentAdxLowIndicator().getMinusDI() &&ti.getCurrentStochasticLowIndicator().getKP() > ti.getCurrentStochasticLowIndicator().getDP())
             return 1;
         else
             return 0;

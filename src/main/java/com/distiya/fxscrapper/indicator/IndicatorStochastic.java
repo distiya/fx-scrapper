@@ -59,7 +59,7 @@ public class IndicatorStochastic implements ITechnicalIndicator{
                 touchedBelow = Boolean.TRUE;
             else if(kP > 79)
                 touchAbove = Boolean.TRUE;
-            if(count > 0 && count % 4 == 0)
+            if(count > 0 && count % 2 == 0)
                 resetLevels();
             else
                 count++;

@@ -107,7 +107,7 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private boolean isIndicatorReversalWithProfit(TradeInstrument ti,double tradeCurrentProfitPercentage,Trade tr){
-        return tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && tradeClosableStatus(ti) < 0) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && tradeClosableStatus(ti) > 0));
+        return tradeCurrentProfitPercentage > appConfigProperties.getBroker().getMinTradeProfitPercentage() && ((getUpperScreenTrend(ti) > 0 && tr.getCurrentUnits().doubleValue() > 0 && (tradeActionInLowerWindowRangeBound(ti) < 0 || tradeClosableStatus(ti) < 0)) || (getUpperScreenTrend(ti) < 0 && tr.getCurrentUnits().doubleValue() < 0 && (tradeActionInLowerWindowRangeBound(ti) > 0 || tradeClosableStatus(ti) > 0)));
     }
 
     private boolean isTrendReversalWithLoss(TradeInstrument ti,Trade tr){
@@ -141,6 +141,15 @@ public class TripleScreenStrategy implements ITradeStrategy{
             return 0;
     }
 
+    private int tradeActionInLowerWindowRangeBound(TradeInstrument ti){
+        if(ti.getCurrentAdxLowIndicator().getADX() < 25 && ti.getCurrentStochasticLowIndicator().getTouchedBelow())
+            return 1;
+        if(ti.getCurrentAdxLowIndicator().getADX() < 25 && ti.getCurrentStochasticLowIndicator().getTouchAbove())
+            return -1;
+        else
+            return 0;
+    }
+
     private int tradeEnterStatus(TradeInstrument ti){
         if(ti.getCurrentAdxLowIndicator().getADX() > 25 && ti.getCurrentAdxLowIndicator().getMinusDI() > ti.getCurrentAdxLowIndicator().getPlusDI() && ti.getCurrentStochasticLowIndicator().getKP() < ti.getCurrentStochasticLowIndicator().getDP())
             return -1;
@@ -151,9 +160,9 @@ public class TripleScreenStrategy implements ITradeStrategy{
     }
 
     private int tradeOpeningStatus(TradeInstrument ti){
-        if(getUpperScreenTrend(ti) > 0 && tradeEnterStatus(ti) > 0 && ti.getCurrentStochasticLowIndicator().getTouchedBelow())
+        if(getUpperScreenTrend(ti) > 0 && (tradeEnterStatus(ti) > 0 || tradeActionInLowerWindowRangeBound(ti) > 0))
             return 1;
-        else if(getUpperScreenTrend(ti) < 0 && tradeEnterStatus(ti) < 0 && ti.getCurrentStochasticLowIndicator().getTouchAbove())
+        else if(getUpperScreenTrend(ti) < 0 && (tradeEnterStatus(ti) < 0 || tradeActionInLowerWindowRangeBound(ti) < 0))
             return -1;
         else
             return 0;

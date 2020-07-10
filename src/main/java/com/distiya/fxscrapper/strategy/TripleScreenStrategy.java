@@ -201,19 +201,25 @@ public class TripleScreenStrategy implements ITradeStrategy{
 
     private void openAllEligibleTrades(List<TradeInstrument> tradableInstruments){
         tradableInstruments.stream().forEach(ti->{
-            if(Math.floor(ti.getMaxUnits()) > 0 && tradeOpeningStatus(ti) > 0){
+            if(ti.getMaxUnits() > 0 && tradeOpeningStatus(ti) > 0){
                 log.info("Opening a buy order with total fraction for {} is {}",ti.getInstrument().getName(),ti.getCurrentFraction());
-                OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * 1.0);
-                ti.getCurrentStochasticLowIndicator().resetLevels();
-                ti.setLastTradeCloseSignal(0);
-                ti.incrementOpenedTradeCount();
+                OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits() * 1.0);
+                if(orderCreateResponse != null){
+                    ti.getCurrentStochasticLowIndicator().resetLevels();
+                    ti.setLastTradeCloseSignal(0);
+                    ti.incrementOpenedTradeCount();
+                    ti.setMaxUnits(0.0d);
+                }
             }
-            else if(Math.floor(ti.getMaxUnits()) > 0 && tradeOpeningStatus(ti) < 0){
+            else if(ti.getMaxUnits() > 0 && tradeOpeningStatus(ti) < 0){
                 log.info("Opening a sell order with total fraction for {} is {}",ti.getInstrument().getName(),ti.getCurrentFraction());
-                OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), Math.floor(ti.getMaxUnits()) * -1.0);
-                ti.getCurrentStochasticLowIndicator().resetLevels();
-                ti.setLastTradeCloseSignal(0);
-                ti.incrementOpenedTradeCount();
+                OrderCreateResponse orderCreateResponse = orderService.placeMarketOrderForCurrentAccount(ti.getInstrument().getName(), ti.getMaxUnits() * -1.0);
+                if(orderCreateResponse != null){
+                    ti.getCurrentStochasticLowIndicator().resetLevels();
+                    ti.setLastTradeCloseSignal(0);
+                    ti.incrementOpenedTradeCount();
+                    ti.setMaxUnits(0.0d);
+                }
             }
         });
     }

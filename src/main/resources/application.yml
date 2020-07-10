@@ -248,7 +248,7 @@ app:
         - ticker: NL25_EUR
           enabled: false
         - ticker: SG30_SGD
-          enabled: true
+          enabled: false
           isIndex: true
           baseCurrency: SGD
         - ticker: DE30_EUR
@@ -282,7 +282,7 @@ app:
         - ticker: WTICO_USD
           enabled: false
         - ticker: AU200_AUD
-          enabled: true
+          enabled: false
           isIndex: true
           baseCurrency: AUD
         - ticker: UK100_GBP

@@ -248,23 +248,31 @@ app:
         - ticker: NL25_EUR
           enabled: false
         - ticker: SG30_SGD
-          enabled: false
+          enabled: true
+          isIndex: true
+          baseCurrency: SGD
         - ticker: DE30_EUR
           enabled: false
         - ticker: IN50_USD
           enabled: false
         - ticker: TWIX_USD
-          enabled: false
+          enabled: true
+          isIndex: true
+          baseCurrency: USD
         - ticker: MBTC_USD
           enabled: false
         - ticker: CORN_USD
           enabled: false
         - ticker: EU50_EUR
-          enabled: false
+          enabled: true
+          isIndex: true
+          baseCurrency: EUR
         - ticker: CN50_USD
           enabled: false
         - ticker: FR40_EUR
-          enabled: false
+          enabled: true
+          isIndex: true
+          baseCurrency: EUR
         - ticker: HK33_HKD
           enabled: false
         - ticker: US30_USD
@@ -274,7 +282,9 @@ app:
         - ticker: WTICO_USD
           enabled: false
         - ticker: AU200_AUD
-          enabled: false
+          enabled: true
+          isIndex: true
+          baseCurrency: AUD
         - ticker: UK100_GBP
           enabled: false
         - ticker: SUGAR_USD
@@ -366,6 +376,7 @@ app:
         - symbol: M
           months: 1
           enabled: false
+#Permitted indices : EU50_EUR,SPX500_USD,AU200_AUD,FR40_EUR,SG30_SGD,TWIX_USD
 #Major currency pairs : EUR_USD,USD_JPY,USD_CAD,AUD_USD,EUR_GBP,EUR_JPY,EUR_CHF,GBP_CHF,GBP_USD,USD_CHF,USD_MXN
 ---
 spring:

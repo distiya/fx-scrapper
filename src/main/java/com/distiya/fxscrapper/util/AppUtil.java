@@ -82,14 +82,14 @@ public class AppUtil {
         }
         if(portfolioStatus.getTradeInstrumentMap().containsKey(instrument)){
             TradeInstrument tradeInstrument = portfolioStatus.getTradeInstrumentMap().get(instrument);
-            units = (portfolioStatus.getMargin()/portfolioStatus.getAppConfigProperties().getBroker().getMarginRatio()) * tradeInstrument.getCurrentFraction()/baseHomeRate;
+            units = (portfolioStatus.getMargin()/tradeInstrument.getInstrument().getMarginRate().doubleValue()) * tradeInstrument.getCurrentFraction()/baseHomeRate;
             if(portfolioStatus.getIndexTickers().containsKey(instrument)){
                 units = units/tradeInstrument.getCurrentLowMarket().getC().doubleValue();
                 if(units >= 3.0){
                     units = units - 2.0;
                 }
             }
-            tradeInstrument.setMaxUnits(Math.floor(units > 0 ? units : 0.0d));
+            tradeInstrument.setMaxUnits(Math.min(Math.floor(units > 0 ? units : 0.0d),tradeInstrument.getInstrument().getMaximumOrderUnits().doubleValue()));
         }
         return units;
     }

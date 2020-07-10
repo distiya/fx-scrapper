@@ -86,4 +86,13 @@ public class OandaApiTest {
             System.out.println("Prediction for Instrument Name : "+ti.getInstrument().getName().toString()+", O:"+ti.getCurrentPredicted().getO().doubleValue()+",C:"+ti.getCurrentPredicted().getC().doubleValue()+",H:"+ti.getCurrentPredicted().getH().doubleValue()+",L:"+ti.getCurrentPredicted().getL().doubleValue());
         });
     }*/
+
+    /*@Test
+    public void testInstrumentDetails(){
+        portfolioStatus.getTradableInstruments().stream().forEach(in->{
+            System.out.println("=============== Printing Trade Instrument Data Started =============");
+            System.out.println("Name : "+in.getName().toString()+", Margin Rate : "+in.getMarginRate()+", Max Units : "+in.getMaximumPositionSize().doubleValue());
+            System.out.println("=============== Printing Trade Instrument Data Ended =============");
+        });
+    }*/
 }

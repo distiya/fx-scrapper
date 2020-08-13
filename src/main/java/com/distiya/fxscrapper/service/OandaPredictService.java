@@ -2,7 +2,6 @@ package com.distiya.fxscrapper.service;
 
 import com.distiya.fxscrapper.domain.PortfolioStatus;
 import com.distiya.fxscrapper.domain.TradeInstrument;
-import com.distiya.fxscrapper.predict.*;
 import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.CandlestickData;
 import com.oanda.v20.instrument.CandlestickGranularity;

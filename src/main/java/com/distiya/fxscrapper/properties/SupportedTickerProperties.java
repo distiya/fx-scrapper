@@ -14,4 +14,5 @@ public class SupportedTickerProperties {
     private Boolean enabled = false;
     private Boolean isIndex = false;
     private String baseCurrency = "USD";
+    private Double multiplier = 1.0d;
 }

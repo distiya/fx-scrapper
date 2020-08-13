@@ -24,15 +24,15 @@ app:
     broker:
       name: oanda
       mode: DEMO
-      tradingMode: true
-      scrappingMode: false
+      tradingMode: false
+      scrappingMode: true
       streamingMode: true
       streamingSubscriber: false
       skipFutureTrades: false
       apiToken: ${OANDA_API_TOKEN}
       apiAccount: ${OANDA_API_ACCOUNT}
-      dataLocation: /home/sasitha/coding/fx/data/oanda/
-      startDate: 2000-01-01
+      dataLocation: /home/distiya/coding/fx/data/oanda/
+      startDate: 2005-01-04
       lowTimeFrame: M2
       highTimeFrame: M10
       defaultPredictBatchLength: 48
@@ -53,6 +53,7 @@ app:
       supportedTickers:
         - ticker: GBP_USD
           enabled: false
+          multiplier: 10000.0
         - ticker: USD_MXN
           enabled: false
         - ticker: XAG_USD
@@ -256,7 +257,7 @@ app:
         - ticker: IN50_USD
           enabled: false
         - ticker: TWIX_USD
-          enabled: true
+          enabled: false
           isIndex: true
           baseCurrency: USD
         - ticker: MBTC_USD
@@ -264,7 +265,7 @@ app:
         - ticker: CORN_USD
           enabled: false
         - ticker: EU50_EUR
-          enabled: true
+          enabled: false
           isIndex: true
           baseCurrency: EUR
         - ticker: CN50_USD
@@ -274,9 +275,9 @@ app:
           isIndex: true
           baseCurrency: EUR
         - ticker: HK33_HKD
-          enabled: false
+          enabled: true
         - ticker: US30_USD
-          enabled: false
+          enabled: true
         - ticker: SOYBN_USD
           enabled: false
         - ticker: WTICO_USD
@@ -286,15 +287,15 @@ app:
           isIndex: true
           baseCurrency: AUD
         - ticker: UK100_GBP
-          enabled: false
+          enabled: true
         - ticker: SUGAR_USD
           enabled: false
         - ticker: JP225_USD
-          enabled: false
+          enabled: true
         - ticker: WHEAT_USD
           enabled: false
         - ticker: SPX500_USD
-          enabled: true
+          enabled: false
           isIndex: true
           baseCurrency: USD
         - ticker: UK10YB_GBP
@@ -314,7 +315,7 @@ app:
         - ticker: USB02Y_USD
           enabled: false
         - ticker: NAS100_USD
-          enabled: false
+          enabled: true
       supportedResolutions:
         - symbol: S5
           seconds: 5
@@ -327,19 +328,19 @@ app:
           enabled: false
         - symbol: S30
           seconds: 30
-          enabled: false
+          enabled: true
         - symbol: M1
           minutes: 1
           enabled: false
         - symbol: M2
           minutes: 2
-          enabled: true
+          enabled: false
         - symbol: M5
           minutes: 5
           enabled: false
         - symbol: M10
           minutes: 10
-          enabled: true
+          enabled: false
         - symbol: M15
           minutes: 15
           enabled: false

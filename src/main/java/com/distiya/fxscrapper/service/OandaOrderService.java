@@ -7,7 +7,6 @@ import com.oanda.v20.Context;
 import com.oanda.v20.ExecuteException;
 import com.oanda.v20.RequestException;
 import com.oanda.v20.account.AccountID;
-import com.oanda.v20.order.*;
 import com.oanda.v20.primitives.InstrumentName;
 import com.oanda.v20.transaction.TransactionID;
 import lombok.AllArgsConstructor;

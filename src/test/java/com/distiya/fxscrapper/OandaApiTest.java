@@ -1,7 +1,9 @@
 package com.distiya.fxscrapper;
 
 import com.distiya.fxscrapper.domain.PortfolioStatus;
-import com.distiya.fxscrapper.service.*;
+import com.distiya.fxscrapper.service.OandaHistoryService;
+import com.distiya.fxscrapper.service.OandaOrderService;
+import com.distiya.fxscrapper.service.OandaPredictService;
 import com.oanda.v20.Context;
 import com.oanda.v20.account.AccountID;
 import org.junit.jupiter.api.Test;

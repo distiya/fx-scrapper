@@ -1,7 +1,5 @@
 package com.distiya.fxscrapper.domain;
 
-import lombok.*;
-
 @Getter
 @Setter
 @AllArgsConstructor

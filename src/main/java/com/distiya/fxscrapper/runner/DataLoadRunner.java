@@ -28,7 +28,7 @@ public class DataLoadRunner implements CommandLineRunner {
                 .forEach(t->{
                     appConfigProperties.getBroker().getSupportedResolutions().stream().filter(SupportedResolutionProperties::getEnabled)
                             .forEach(r->{
-                                oandaHistoryService.requestHistory(t.getTicker(),r, appConfigProperties.getBroker().getStartDate());
+                                oandaHistoryService.requestHistory(t,r, appConfigProperties.getBroker().getStartDate());
                             });
                 });
         log.info("Data loading completed");
